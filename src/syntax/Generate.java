@@ -1,4 +1,4 @@
-package syntax.preprocess;
+package syntax;
 
 import java.io.Closeable;
 import java.io.FileInputStream;
@@ -12,8 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import syntax.Var;
-import syntax.VarType;
 
 /*  preprocess
      * 输入文法，将文法中"|"展开，存放在map中，从1开始，key:产生式左边，value:list 产生式右
@@ -28,47 +26,36 @@ import syntax.VarType;
 
  */
 
-public class PreProcess {
-  //k:产生式序号 v:产生式，index=0存放 产生式左边
-  private static Map<Integer, List<Var>> productions = new HashMap<>();
-  private static Set<Var> terminalSet = new HashSet<>();
-  private static Set<Var> nonTerminalSet = new HashSet<>();
-  private static Map<String,Set<Var>>  first = new HashMap<>();
-  private static Map<String,Set<Var>>  follow = new HashMap<>();
+public class Generate {
+  public List<Production>productions=new ArrayList<>();
+ // private static Map<Integer, List<Var>> productions = new HashMap<>();
+  private static Set<String> terminals = new HashSet<>();
+  private static Set<String> nonTerminals = new HashSet<>();
+  private static Map<String,Set<String>>  first = new HashMap<>();
+  private static Map<String,Set<String>>  follow = new HashMap<>();
 
-  public void init(){
-    String path="/Users/yezizhi/Desktop/compiler/src/syntax/preprocess/grammar1.txt";
-    int index=0;
+  public void inputGrammar(){
+    String path="/Users/yezizhi/Desktop/compiler/src/grammar.txt";
     try {
-      List<Var>res=new ArrayList<>();
       String ori=readFromTxt(path);
-      for(String string:ori.split("\n")){
-        Var left= new Var(string.split(" -> ")[0],false, VarType.nonTer);
-        res.add(left);
-        String preRight=string.split(" -> ")[1];
-        for(String s:preRight.split(" ")){
-          if(s.endsWith("+")){
-            Var v =new Var(s,true);
-            res.add(v);
-          }else{
-            Var v =new Var(s,false);
-            res.add(v);
-          }
-        }
-        nonTerminalSet.add(left);
-        productions.put(index++,res);
-        terminalSet.addAll(res);
+      for(String line:ori.split("\n")){
+        String left=line.split(" -> ")[0];
+        List<String>right=new ArrayList<>(Arrays.asList(line.split(" -> ")[1].split(" ")));;
+        Production p =new Production(left,right);
+        productions.add(p);
+        nonTerminals.add(left);
+        terminals.addAll(right);
       }
-      terminalSet.removeIf(v -> nonTerminalSet.contains(v));
-      //terminalSet.removeIf(v -> v.endsWith("*")||v.equals("+"));
-   //showMap(productions);
+      terminals.removeIf(s -> nonTerminals.contains(s));
+
+
       System.out.println("================Terminal===============");
-      for(Var s:terminalSet){
-        System.out.println(s.toString());
+      for(String s:terminals){
+        System.out.println(s);
       }
       System.out.println("================Non-Terminal===============");
-      for(Var s:nonTerminalSet){
-        System.out.println(s.toString());
+      for(String s:nonTerminals){
+        System.out.println(s);
       }
 
 
@@ -86,11 +73,11 @@ public class PreProcess {
 
   }
 
-//  public Map<Integer, List<String>> getProductions(){return productions;}
-//  public Set<String> getTerminals(){return terminalSet;}
-//  public Set<String>getNonTerminals(){return nonTerminalSet;}
-//  public Map<String,Set<String>> getFirst(){return  first;}
-//  public Map<String,Set<String>> getFollow(){return  follow;}
+//  public Map<Integer, List<Var>> getProductions(){return productions;}
+//  public Set<Var> getTerminals(){return terminalSet;}
+//  public Set<Var>getNonTerminals(){return nonTerminalSet;}
+//  public Map<String,Set<Var>> getFirst(){return  first;}
+//  public Map<String,Set<Var>> getFollow(){return  follow;}
 
   private String readFromTxt(String filename) throws Exception {
     Reader reader = null;

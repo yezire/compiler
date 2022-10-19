@@ -1,10 +1,10 @@
 
-import syntax.preprocess.PreProcess;
+import syntax.Generate;
 
 public class Main {
   public static void main(String[] args)  {
-PreProcess preprocess =new PreProcess();
-preprocess.init();
+Generate preprocess =new Generate();
+preprocess.inputGrammar();
   }
 
 }
