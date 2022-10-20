@@ -1,0 +1,73 @@
+root -> Program
+Program -> compUnit
+compUnit -> EOF
+compUnit -> decl funcDef  EOF
+decl -> constDecl
+decl -> varDecl
+constDecl -> 'const' bType constDef ';'
+constDecl -> 'const' bType constDef ',' constDef ';'
+bType -> 'int'
+constDef -> Ident '=' constInitVal
+constInitVal -> constExp
+varDecl -> bType varDef ';'
+varDecl -> bType varDef ',' varDef ';'
+varDef -> Ident
+varDef -> Ident '=' initVal
+initVal -> exp
+funcDef -> funcType Ident '(' ')' block
+funcDef -> funcType Ident '(' funcFParams ')' block
+funcType -> 'void'
+funcType -> 'int'
+funcFParams -> funcFParam
+funcFParams -> funcFParam ',' funcFParam
+funcFParam -> bType Ident
+block -> '{' '}'
+block -> '{' blockItem blockItem '}'
+blockItem -> decl
+blockItem -> stmt
+stmt -> lVal '=' exp ';'
+stmt -> ';'
+stmt -> exp ';'
+stmt -> block
+stmt -> 'return' ';'
+stmt -> 'return' exp ';'
+exp -> addExp
+cond -> lOrExp
+lVal -> Ident
+primaryExp -> '(' exp ')'
+primaryExp -> lVal
+primaryExp -> number
+number -> IntConst
+unaryExp -> primaryExp
+unaryExp -> Ident '(' ')'
+unaryExp -> Ident '(' funcRParams ')'
+unaryExp -> unaryOp unaryExp
+unaryOp -> '+'
+unaryOp -> '-'
+unaryOp -> '!'
+funcRParams -> funcRParam
+funcRParams -> funcRParam ',' funcRParam
+funcRParam -> exp
+mulExp -> unaryExp
+mulExp -> mulExp '*' unaryExp
+mulExp -> mulExp '/' unaryExp
+mulExp -> mulExp '%' unaryExp
+addExp -> mulExp # add1
+addExp -> addExp '+' mulExp
+addExp -> addExp '-' mulExp
+relExp -> addExp
+relExp -> relExp '<' addExp
+relExp -> relExp '>' addExp
+relExp -> relExp '<=' addExp
+relExp -> relExp '>=' addExp
+eqExp -> relExp
+eqExp -> eqExp '==' relExp
+eqExp -> eqExp '!=' relExp
+lAndExp -> eqExp
+lAndExp -> lAndExp '&&' eqExp
+lOrExp -> lAndExp
+lOrExp -> lOrExp '||' lAndExp
+constExp -> addExp
+IntConst -> [0-9]+
+Ident -> [a-zA-Z_]
+Ident -> [a-zA-Z_] [a-zA-Z_0-9]+
