@@ -10,6 +10,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 
+/**
+ * lr0
+ *
+ * @author yezizhi
+ * @date 2022/10/21
+ */
 public class LR0 {
 
   private static final Map<Group, Map<String, Group>> GOTO_TABLE = new HashMap<>();// current state + var ->next state
@@ -21,6 +27,12 @@ public class LR0 {
   static Set<String> allVars = new HashSet<>();
 
 
+  /**
+   * 闭包
+   *
+   * @param items 项目
+   * @return {@link Set}<{@link Item}>
+   */
   private static Set<Item> closures(Set<Item> items) {
     Set<Item> result = new HashSet<Item>();
     Stack<Item> stack = new Stack<Item>();
@@ -139,8 +151,9 @@ public class LR0 {
   }
 
   public static void createTable() {
-
+//求出所有项目集
     List<Group> allGroups = getAllGroups();
+
     // System.out.println(allGroups);
 //    List<Group> moveGroups = new ArrayList<>();
 //    List<Group> reductionGroups = new ArrayList<>();
