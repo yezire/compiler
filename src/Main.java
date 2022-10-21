@@ -1,12 +1,13 @@
 
-import syntax.Generate;
+import syntax.Grammar;
 
 public class Main {
   public static void main(String[] args)  {
-Generate preprocess =new Generate();
+Grammar preprocess =new Grammar();
 preprocess.inputGrammar();
 preprocess.generateFirstCollection();
-preprocess.showMap(Generate.first);
+preprocess.showMap(Grammar.getFirst());
+
   }
 
 }

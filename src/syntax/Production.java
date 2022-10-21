@@ -10,10 +10,13 @@ import java.util.List;
 public class Production {
 private String left;
 private List<String> right;
+private int id;
+private  static int idPool=0;
 
 public Production(String left,List<String>right){
   this.left = left;
   this.right = right;
+  this.id = idPool++;
 }
   public List<String> getRights(){
     return right;
@@ -22,5 +25,7 @@ public Production(String left,List<String>right){
   public String getLeft(){
     return left;
   }
+
+  public  int getId(){return id;}
 
 }

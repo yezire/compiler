@@ -1,7 +1,6 @@
-root -> Program
 Program -> compUnit
 compUnit -> EOF
-compUnit -> decl funcDef  EOF
+compUnit -> decl funcDef EOF
 decl -> constDecl
 decl -> varDecl
 constDecl -> 'const' bType constDef ';'

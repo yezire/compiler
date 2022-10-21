@@ -7,10 +7,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,17 +20,25 @@ import java.util.Set;
  * 标记终结符，非终结符
  */
 
-public class Generate {
+public class Grammar {
 
-  public List<Production> productions = new ArrayList<>();
+  public static List<Production> productions = new ArrayList<>();
+  public static  Map<String,List<Production>> productionsByLeft= new HashMap<>();
   // private static Map<Integer, List<Var>> productions = new HashMap<>();
   private static Set<String> terminals = new HashSet<>();
   private static Set<String> nonTerminals = new HashSet<>();
   public static Map<String, Set<String>> first = new HashMap<>();
   private static Map<String, Set<String>> follow = new HashMap<>();
 
+
+
+
+  /**
+   * 输入语法
+   */
   public void inputGrammar() {
-    String path = "/Users/yezizhi/Desktop/compiler/src/grammar0.txt";
+    //String path = "/Users/yezizhi/Desktop/compiler/src/grammar0.txt";
+    String path ="/Users/yezizhi/Desktop/compiler/src/syntax/grammarTest.txt";
     try {
       String ori = readFromTxt(path);
       for (String line : ori.split("\n")) {
@@ -62,11 +68,10 @@ public class Generate {
   }
 
   /**
-   * 求first集:非终结符，终结符就是它本身 first(A)={a| A ==>+ B} - if (A ==>+ ε) then add ε to first(A) - 有产生式A ==>
-   * αβ if (α ∈ VT) then add α to first(A) - 有产生式A ==> Bβ add first(B) to first(A)
+   * 求first集:非终结符，终结符就是它本身 first(A)={a| A ==>+ B} - if (A ==>+ ε) then add ε to first(A) -
+   * 有产生式A ==> αβ if (α ∈ VT) then add α to first(A) - 有产生式A ==> Bβ add first(B) to first(A)
    */
   public void generateFirstCollection() {
-
     //所有终结符的first集合就是自己
     for (String ter : terminals) {
       Set<String> set = new HashSet<>();
@@ -81,7 +86,6 @@ public class Generate {
 
     while (true) {
       Map<String, Set<String>> firstClone = new HashMap<>();
-
       for(Entry<String,Set<String>>entry:first.entrySet()){
         Set<String>set=new HashSet<>();
         for(String s:entry.getValue() ){
@@ -93,12 +97,12 @@ public class Generate {
       for (Production p : productions) {
         String rightHead = p.getRights().get(0);
         // * - 有产生式A ==> αβ if (α ∈ VT) then add α to first(A)
-        if (terminals.contains(p.getRights().get(0))) {
+        if (terminals.contains(rightHead)) {
           Set<String> set = firstClone.get(p.getLeft());
           set.add(rightHead);
           firstClone.replace(p.getLeft(), set);
         }
-        if (nonTerminals.contains(p.getRights().get(0)) && firstClone.containsKey(rightHead)) {
+        if (nonTerminals.contains(rightHead) && firstClone.containsKey(rightHead)) {
           Set<String> set = firstClone.get(p.getLeft());
           set.addAll(firstClone.get(rightHead));
           firstClone.replace(p.getLeft(), set);
@@ -111,10 +115,14 @@ public class Generate {
         first = firstClone;
       }
     }
-
-
   }
 
+  /**
+   * 判断两个map是否相同
+   * @param a mapA
+   * @param b mapB
+   * @return boolean
+   */
   private boolean isSameMap(Map<String, Set<String>> a, Map<String, Set<String>> b) {
     for (Entry<String, Set<String>> entry : a.entrySet()) {
       Set<String> thisSet = entry.getValue();
@@ -125,16 +133,34 @@ public class Generate {
     }
     return true;
   }
-  
+
 
   public void generateFollowCollection() {
-
+//todo
   }
 
+public void generateProductionsByLeft(){
+    for(Production p :productions){
+      //List<Production>list=productionsByLeft.containsKey(p.getLeft())?productionsByLeft.get(p.getLeft()):new ArrayList<>();
+//      list.add(p);
+
+      if(productionsByLeft.containsKey(p.getLeft())){
+        List<Production>list=productionsByLeft.get(p.getLeft());
+        list.add(p);
+        productionsByLeft.replace(p.getLeft(),list);
+      }else{
+        List<Production>list=new ArrayList<>();
+        list.add(p);
+        productionsByLeft.put(p.getLeft(),list);
+      }
+    }
+}
+
+
 //  public Map<Integer, List<Var>> getProductions(){return productions;}
-//  public Set<Var> getTerminals(){return terminalSet;}
-//  public Set<Var>getNonTerminals(){return nonTerminalSet;}
-//  public Map<String,Set<Var>> getFirst(){return  first;}
+public static Set<String> getTerminals(){return terminals;}
+  public static Set<String>getNonTerminals(){return nonTerminals;}
+  public static Map<String,Set<String>> getFirst(){return  first;}
 //  public Map<String,Set<Var>> getFollow(){return  follow;}
 
   private String readFromTxt(String filename) throws Exception {
@@ -142,8 +168,6 @@ public class Generate {
     try {
       StringBuffer buf = new StringBuffer();
       char[] chars = new char[1024];
-      // InputStream in=new FileInputStream(filename);
-
       reader = new InputStreamReader(new FileInputStream(filename), "UTF-8");
       int readed = reader.read(chars);
       while (readed != -1) {
