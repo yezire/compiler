@@ -8,8 +8,8 @@ import java.util.Set;
 public class TokenEnum {
 	// 创建一个set存放所有的tags
 				// tag不应该有歧义
-				 public static final Set<String> tags = new HashSet<>(Arrays.asList(" ","+","-","*","/","%", "=", ">", "<", "[^=]", "[^>]","!","&","[|]",
-				        "[(]", "[)]", "[{]","[}]",";",
+				 public static final Set<String> tags = new HashSet<>(Arrays.asList(" ","[+]","[-]","[*]","[/]","[%]", "[=]", "[>]", "[<]", "[^=]", "[^>]","[!]","[&]","[|]",
+				        "[(]", "[)]", "[{]","[}]","[;]","[,]",
 				        "[_a-zA-Z]", "[_0-9a-zA-Z]", "[^_0-9a-zA-Z]",
 				        "[1-9]", "[0-9]", "[.]", "[^.0-9]", "[^0-9]", //新增加的,
 				        "[0]"

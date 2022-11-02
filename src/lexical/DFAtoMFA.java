@@ -1,33 +1,36 @@
 package lexical_analysis;
 
 
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.Set;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.*;
+
 
 public class DFAtoMFA {
 	private static final String NULL = null;
 	TokenEnum tokenenum=new TokenEnum();
-	DFA dfa;
+	 DFA dfa;
+	int nowId;
+	int startId;
 	//存放节点
-    ArrayList<Node> nodes = new ArrayList<Node>();
-	//存放边
-	ArrayList<DFAEdge> edges = new ArrayList<DFAEdge>();
-	int nowId,startId;
-	public DFA mfa;
-	public DFAtoMFA(DFA dfa) {
+		ArrayList<Node> nodes = new ArrayList<Node>();
+		    //存放边
+		ArrayList<DFAEdge> edges = new ArrayList<DFAEdge>();
+	MFA mfa=new MFA();
+
+	public  DFAtoMFA(DFA dfa) {
 		this.dfa = dfa;
 		// 当前状态机所在的位置
 		this.nowId = 0;
 		// 开始节点
 		this.startId = 0;
-		this.buildMFA();
+		this.buildMFA(dfa);
 	}
 		//从 node 经过 tag 转移能到达的所有状态的集合
 		public int getToNode(int nodeId,String tag) {
@@ -39,10 +42,11 @@ public class DFAtoMFA {
 		return 0;
 		}
 
-        public void buildMFA() {
+        public MFA buildMFA(DFA dfa) {
 		//如果只有一个节点，那它本身为MFA
 			if (this.dfa.nodes.size() <= 1) {
-			this.mfa = this.dfa;
+			this.mfa.nodes = dfa.nodes;
+			this.mfa.edges = dfa.edges;
 			}
 
 			ArrayList<Integer> finalNoBackNodesOP = new ArrayList<Integer>();//存储终态并且不会回退的节点的编号
@@ -216,9 +220,45 @@ public class DFAtoMFA {
 			this.getnewDfa(pos,this.dfa);
 			
 	        }
+			return mfa;
       }
 		
 	
+		
+											
+		public void getnewDfa(HashMap hashmap,DFA dfa) {
+			this.startId = (int) hashmap.get(dfa.startId);
+			// print(self.startId)
+			HashSet <Integer> addSets = new HashSet<Integer>(); // 存储加入新的DFA的节点
+			// 在新的DFA加入节点
+			
+			hashmap.forEach(( key,  value) -> {
+				if (!addSets.contains(value)) {
+					addSets.addAll(hashmap.values());
+					mfa.add_node((int)value, dfa.nodes.get((int) key).isFinal, dfa.nodes.get((int) key).isBackOff,dfa.nodes.get((int) key).tag);	
+		        }
+			});
+			
+		    //三元组形式的dfaedge，addedges记录已加入的边
+		    HashMap <Integer, String> map = new HashMap<Integer, String>();  
+		    HashMap <Integer, HashMap<Integer, String>> addEdges = new HashMap<Integer, HashMap<Integer, String>>();
+		    for (DFAEdge edge : dfa.edges) {
+		    	map.put((int)hashmap.get(edge.toNodeId), edge.tag);
+		        HashMap <Integer, HashMap<Integer, String>> tup = new HashMap<Integer, HashMap<Integer, String>>();
+		        tup.put ((int) hashmap.get(edge.fromNodeId), map);
+		        //再加入addedges，map和tup只是中间结构
+					for(int tupkey:tup.keySet()) {
+					if (!addEdges.containsKey(tupkey)) {
+					mfa.add_edges((int)hashmap.get(edge.fromNodeId), (int)hashmap.get(edge.toNodeId),edge.tag);
+					addEdges.put((int) hashmap.get(edge.fromNodeId), map);
+					}
+					// print('addSets: ' + str(addSets))
+					}
+	        }
+		
+			}
+		
+		
 		//添加节点
 		public void add_node( int id, int is_final, int is_back_off, String tag) {
 			Node new_node = new Node(id, is_final, is_back_off, tag);
@@ -239,7 +279,7 @@ public class DFAtoMFA {
 		// 获得下一个ID
 		public boolean next_id(String tag) {
 			for (DFAEdge edge : this.edges) {
-				if (edge.fromNodeId == this.nowId && edge.tag==tag){
+				if (edge.fromNodeId == this.nowId &&  edge.tag.matches(tag)){
 					//并将nowId指向新的位置
 					this.nowId = edge.toNodeId;
 					return true;// 说明成功找到下一个节点
@@ -310,40 +350,6 @@ public class DFAtoMFA {
 			}
 			return null;
 		}
-		
-											
-		public void getnewDfa(HashMap hashmap,DFA dfa) {
-			this.startId = (int) hashmap.get(dfa.startId);
-			// print(self.startId)
-			Set <Integer> addSets = new HashSet<Integer>(); // 存储加入新的DFA的节点
-			// 在新的DFA加入节点
-			
-			hashmap.forEach(( key,  value) -> {
-				if (!addSets.contains(value)) {
-					addSets.addAll(hashmap.values());
-					this.add_node((int)value, dfa.nodes.get((int) key).isFinal, dfa.nodes.get((int) key).isBackOff,dfa.nodes.get((int) key).tag);	
-		        }
-			});
-			
-		    //三元组形式的dfaedge，addedges记录已加入的边
-		    HashMap <Integer, String> map = new HashMap<Integer, String>();  
-		    HashMap <Integer, HashMap<Integer, String>> addEdges = new HashMap<Integer, HashMap<Integer, String>>();
-		    for (DFAEdge edge : dfa.edges) {
-		    	map.put((int)hashmap.get(edge.toNodeId), edge.tag);
-		        HashMap <Integer, HashMap<Integer, String>> tup = new HashMap<Integer, HashMap<Integer, String>>();
-		        tup.put ((int) hashmap.get(edge.fromNodeId), map);
-		        //再加入addedges，map和tup只是中间结构
-					for(int tupkey:tup.keySet()) {
-					if (!addEdges.containsKey(tupkey)) {
-					this.add_edges((int)hashmap.get(edge.fromNodeId), (int)hashmap.get(edge.toNodeId),edge.tag);
-					addEdges.put((int) hashmap.get(edge.fromNodeId), map);
-					}
-					// print('addSets: ' + str(addSets))
-					}
-	        }
-		
-			}
-		
 	
 		
 		

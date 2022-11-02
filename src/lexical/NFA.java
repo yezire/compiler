@@ -4,18 +4,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class NFA {
 	     private int nowId;
-	     private int startId;
+	     int startId;
 	      //存放节点
 			ArrayList<Node> nodes = new ArrayList<>();
 		  //存放边
 			ArrayList<Edge> edges = new ArrayList<Edge>();
-
+			
+            Set<Integer> fromnodeid= new HashSet();
 	public NFA() {
 			
 			// 当前状态机所在的位置
@@ -54,7 +56,7 @@ public class NFA {
 			this.add_node(25, 1, 0, "SE");
 			this.add_node(26, 1, 0, "SE");
 			//标识符IDN
-			this.add_node(27, 1, 0, "OP");
+			this.add_node(27, 0, 0, "");
 			this.add_node(28, 1, 1, "IDNorKWorOP");
 			// 整数、浮点数
 			this.add_node(29, 0, 0, "");
@@ -67,25 +69,25 @@ public class NFA {
 			
 			//添加边的信息
 			//部分OP到 <=>为止
-			this.add_edges(0, 0, " ");
-			this.add_edges(0, 1, "+");
-			this.add_edges(0, 2, "-");
-			this.add_edges(0, 3, "*");
-			this.add_edges(0, 4, "/");
-			this.add_edges(0, 5, "%");
-			this.add_edges(0, 6, "=");
-			this.add_edges(0, 7, ">");
-			this.add_edges(0, 8, "<");
+			this.add_edges(0, 0, "epsilon");
+			this.add_edges(0, 1, "[+]");
+			this.add_edges(0, 2, "[-]");
+			this.add_edges(0, 3, "[*]");
+			this.add_edges(0, 4, "[/]");
+			this.add_edges(0, 5, "[%]");
+			this.add_edges(0, 6, "[=]");
+			this.add_edges(0, 7, "[>]");
+			this.add_edges(0, 8, "[<]");
 			this.add_edges(6, 18, "[^=]");
-			this.add_edges(6, 9, "=");
+			this.add_edges(6, 9, "[=]");
 			this.add_edges(7, 19, "[^=]");
-			this.add_edges(7, 11, "=");
+			this.add_edges(7, 11, "[=]");
 			this.add_edges(8, 20, "[^=]");
-			this.add_edges(8, 10, "=");
-			this.add_edges(0, 12, "!");
-			this.add_edges(12,13, "=");
-			this.add_edges(0, 14, "&");
-			this.add_edges(14,15, "&");
+			this.add_edges(8, 10, "[=]");
+			this.add_edges(0, 12, "[!]");
+			this.add_edges(12,13, "[=]");
+			this.add_edges(0, 14, "[&]");
+			this.add_edges(14,15, "[&]");
 			this.add_edges(0, 16, "[|]");
 			this.add_edges(16, 17, "[|]");
 			//界符SE
@@ -93,8 +95,8 @@ public class NFA {
 			this.add_edges(0, 22, "[)]");
 			this.add_edges(0, 23, "[{]");
 			this.add_edges(0, 24, "[}]");
-			this.add_edges(0, 25, ";");
-			this.add_edges(0, 26, ",");
+			this.add_edges(0, 25, "[;]");
+			this.add_edges(0, 26, "[,]");
 			//标识符
 			this.add_edges(0,  27, "[_a-zA-Z]");
 			this.add_edges(27, 27, "[_0-9a-zA-Z]");
@@ -117,19 +119,37 @@ public class NFA {
 	}
 
 	//添加边
+	/*
 	public void add_edges(int from_node_id, int i, String tag) {
-    for(Edge edge:edges) {
-	if(edge.fromNodeId==from_node_id) {
-		edge.toNodeIds.add(i);
-	}//如果该from_node_id已经存在了，那么只用将i加入toNodeIds这个set
-	else{
-    Set<Integer> I = null;
-    I.add(i);
-	Edge new_edge =new Edge(from_node_id, I, tag);
-	edges.add(new_edge);
-	}//如果from_node_id不存在了，创建一个新的set叫I并且将i写入I，再new一条边
-    }
-    
+	int flag=1;
+	if(edges.size()==0) {
+		 Set<Integer> I = new HashSet<Integer>();
+		    I.add(i); 
+			Edge new_edge =new Edge(from_node_id, I, tag);
+			edges.add(new_edge);
+	}
+
+	else {
+		for(Edge edge:edges) {
+		if(edge.fromNodeId==from_node_id && flag==1) {
+			edge.toNodeIds.add(i);
+			flag=0;
+		}//如果该from_node_id已经存在了，那么只用将i加入toNodeIds这个set	
+	    }
+		 if(flag==1){
+			    Set<Integer> I = new HashSet<Integer>();
+			    I.add(i); 
+				Edge new_edge =new Edge(from_node_id, I, tag);
+				edges.add(new_edge);
+				}//如果from_node_id不存在了，创建一个新的set叫I并且将i写入I，再new一条边
+	}
+	
+	}
+	*/
+	public void add_edges(int from_node_id, int i, String tag) {
+		Edge new_edge = new Edge(from_node_id, i,  tag);
+		edges.add(new_edge);
+		
 	}
 	
 	//将指针指向开始节点
