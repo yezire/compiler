@@ -18,12 +18,14 @@ import java.util.Stack;
  */
 public class LR0 {
 
+  public static Map<Group, Map<String, Action>> getTable() {
+    return table;
+  }
+
   private static final Map<Group, Map<String, Group>> GOTO_TABLE = new HashMap<>();// current state + var ->next state
   static Map<Group, Map<String, Action>> table = new HashMap<>();//分析表 K :状态 行 V：{符号 列, action 格子 }
   static Group startGroup;
   static Production startProduction;
-  static Item accItem;
-  static Group accGroup;
   static Set<String> allVars = new HashSet<>();
 
 
@@ -44,7 +46,7 @@ public class LR0 {
       if (Grammar.getTerminals().contains(item.getPosVar()) || item.getPosVar().equals(";")) {
         continue;
       } else {
-        List<Production> productions = Grammar.productionsByLeft.get(item.getPosVar());
+        List<Production> productions = Grammar.getProductionsByLeft().get(item.getPosVar());
         for (Production p : productions) {
           //创建产生式对应的项目
           Item newItem = Item.createProduction(p);
@@ -86,11 +88,6 @@ public class LR0 {
         // 将后继项目添加到nextItems
         Item nextItem = Item.nextByItem(item);
         List<String> label = Item.nextByItem(item).getLabel();
-        if (label.indexOf("•") == label.size() - 1 &&
-            label.get(label.size() - 2).equals(startProduction.getRights().get(0))
-        ) {
-          accItem = nextItem;
-        }
         nextItems.add(nextItem);
       }
     }
@@ -118,8 +115,9 @@ public class LR0 {
   private static List<Group> getAllGroups() {
     allVars.addAll(Grammar.getTerminals());
     allVars.addAll(Grammar.getNonTerminals());
+
     //求解I0
-    startProduction = Grammar.productions.get(0);
+    startProduction = Grammar.getProductions().get(0);
     Item startItem = Item.createProduction(startProduction);
     Set<Item> set = new HashSet<>();
     set.add(startItem);
@@ -153,31 +151,22 @@ public class LR0 {
   public static void createTable() {
 //求出所有项目集
     List<Group> allGroups = getAllGroups();
-
-    // System.out.println(allGroups);
-//    List<Group> moveGroups = new ArrayList<>();
-//    List<Group> reductionGroups = new ArrayList<>();
     for (Group group : allGroups) {
-//     if(isReductionGroup(group)){
-//      if( group.getGroup().contains(accItem)){
-//        accGroup=group;
-//      }else{
-//        reductionGroups.add(group);
-//      }
-//     }else{
-//       moveGroups.add(group);
-//     }
+
+
       for (String var : allVars) {
         //终结符 action表
         if (Grammar.getTerminals().contains(var)) {
+          //todo :acc
+          if(var.equals("#")&&group.isAccGroup()){
+            addToDoubleMap(table, group, var, Action.createAcc());
+          }
           // 归约 r
-          if (group.isReductionGroup()) {
+          else if (group.isReductionGroup()) {
             Production production = group.reProduction;
             addToDoubleMap(table, group, var, Action.createR(production));
           }
           // 移进 s
-          //todo :acc #那一列
-          //if(var.equals("#")&&)
           else if (GOTO_TABLE.get(group).containsKey(var)) {
             Group next = GOTO_TABLE.get(group).get(var);
             addToDoubleMap(table, group, var, Action.createS(next));
@@ -224,6 +213,7 @@ public class LR0 {
     }
     System.out.println(sb.toString());
   }
+
 
 
 }
