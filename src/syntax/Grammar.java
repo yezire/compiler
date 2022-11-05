@@ -41,7 +41,7 @@ public class Grammar {
    */
   public void inputGrammar() {
     // String path ="/Users/yezizhi/Desktop/compiler/src/syntax/grammarTest.txt";
-   String path = "src/test/grammarTest.txt";
+   String path = "src/test/myTestGrammar.txt";
    // String path = "src/test/grammarTest.txt";
     try {
       String ori = readFromTxt(path);

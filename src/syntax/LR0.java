@@ -157,7 +157,7 @@ public class LR0 {
       for (String var : allVars) {
         //终结符 action表
         if (Grammar.getTerminals().contains(var)) {
-          //todo :acc
+          //接受 acc
           if(var.equals("#")&&group.isAccGroup()){
             addToDoubleMap(table, group, var, Action.createAcc());
           }

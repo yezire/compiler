@@ -52,10 +52,12 @@ public class Group {
   }
 
   public boolean isAccGroup(){
-    if(itemSet.size()==1){
-      return Grammar.getStart().equals(new ArrayList<>(itemSet).get(0).getProduction().getLeft());
+    for(Item item:itemSet){
+      if (Grammar.getStart().equals(item.getProduction().getLeft())){
+        return true;
+      }
     }
-      return false;
+    return false;
   }
 
   public boolean isReductionGroup() {
