@@ -9,7 +9,7 @@ public class Lexer {
 	TokenTable token_table;
 	DFA dfa;
 	String source;
-	TokenTable tokenTable;
+	public TokenTable tokenTable;
 	public  Lexer(String path,TokenTable token_table,DFA dfa) throws IOException{
 		this.source =  new String(Files.readAllBytes(Paths.get(path)));
 		this.source+=" ";
@@ -36,13 +36,13 @@ public class Lexer {
 		this.dfa.get_start();
 		int ID = 0;
 		int i = 0;
-		
+
 		// System.out.println(this.dfa.next_id(Character.toString(ch)));
 		//for (DFAEdge edge : this.dfa.edges) {
 		//	System.out.println(edge.fromNodeId+","+edge.toNodeId+","+edge.tag);
 		//	}
 		// System.out.println(this.dfa.edges);
-		
+
 		while (i < text.length()) {
 			// 需要跳过的情况
 			char ch = text.charAt(i);
@@ -56,12 +56,12 @@ public class Lexer {
 			//token_now += " ";
 			//}
 			token_now += ch;
-			
-			
+
+
 			// 匹配成功到下一个节点
 			//System.out.println(this.dfa.next_id(Character.toString(ch)));
-			
-			
+
+
 		    if (this.dfa.next_id(Character.toString(ch))) {
 			   ID = this.dfa.nowId;
 			// 判断is_final
@@ -72,53 +72,53 @@ public class Lexer {
 			     token_now = token_now.substring(0, token_now.length()-1);
 			     i -= 1;
 			     }
-			     
+
 			     // 获得最终节点的tag
 			     String node_tag = this.dfa.get_tag(ID);
 			     // 这个判断应该是dfa提供的
 			     //System.out.println(node_tag);
 			     String token_type = this.dfa.get_token_type(token_now,node_tag);
 			     String token_num = this.dfa.get_token_num(token_now,token_type);
-			     
+
 			   //  System.out.println("node_tag:"+node_tag+"  token_now:"+token_now+"  token_type:"+token_type+"  token_num:"+token_num);
-			     
+
 			     this.tokenTable.push_token(new Token(token_now, token_type,token_num));
 			     token_now = "";
 			     this.dfa.get_start();
-			     
-			    
+
+
 			   }
-			   
+
 			   //else if (this.dfa.is_final(ID)==0) {
 			    i += 1;
 			      // continue;
 			       //}
 
 		    }
-		    
+
 			// 匹配失败，则抛出异常
 			else {
 			System.out.println("Lexical error: 不符合词法！");
 			break;
 			}
-		    
+
 			// 如果最后一个词是属于IDNorKWorOP那么也要加入token_list中
-			
+
 		}//while结束
-		
-		
-		
+
+
+
 		if (this.dfa.is_final(ID)==0) {
 			System.out.println("Lexical error: 最终一个词不是完整的token");
 			}
-		
-		
-		
-			
-			
+
+
+
+
+
 	}
-	
+
 		}
-		
-		
+
+
 

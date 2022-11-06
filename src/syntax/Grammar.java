@@ -39,10 +39,7 @@ public class Grammar {
   /**
    * 输入语法 生成终结符、非终结符 生成first集合，follow集合
    */
-  public void inputGrammar() {
-    // String path ="/Users/yezizhi/Desktop/compiler/src/syntax/grammarTest.txt";
-   String path = "src/test/myTestGrammar.txt";
-   // String path = "src/test/grammarTest.txt";
+  public void inputGrammar( String path) {
     try {
       String ori = readFromTxt(path);
       for (String line : ori.split("\n")) {
@@ -97,7 +94,7 @@ public class Grammar {
 
       for (Production p : productions) {
 
-        String rightHead = p.getRights().get(0);
+        String rightHead = p.getRight().get(0);
         // * - 有产生式A ==> αβ if (α ∈ VT) then add α to first(A)
         if (terminals.contains(rightHead)) {
           Set<String> set = firstClone.get(p.getLeft());
@@ -111,11 +108,11 @@ public class Grammar {
           int index=0;
           //A->BC 若first(B)包含空ε，需要继续求first(C )加入first(A)中。
           // 若first（c）仍旧包含空ε，将空字符ε加入first(A)
-          while(firstClone.get(p.getRights().get(index)).contains("$")){
+          while(firstClone.get(p.getRight().get(index)).contains("$")){
             index++;
-            if(index==p.getRights().size())break;
-            if(firstClone.get(p.getRights().get(index)).size()!=0){
-              set.addAll(firstClone.get(p.getRights().get(index)));
+            if(index==p.getRight().size())break;
+            if(firstClone.get(p.getRight().get(index)).size()!=0){
+              set.addAll(firstClone.get(p.getRight().get(index)));
             }
           }
           firstClone.replace(p.getLeft(), set);

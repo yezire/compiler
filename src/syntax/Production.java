@@ -18,7 +18,7 @@ public Production(String left,List<String>right){
   this.right = right;
   this.id = idPool++;
 }
-  public List<String> getRights(){
+  public List<String> getRight(){
     return right;
   }
 

@@ -18,7 +18,7 @@ public static  final  String TYPE_ERROR = "error";
 
   private final String type;
 
-  // 如果action是移入的时候，stateItemSet代表移入状态，通过stateItemSet的state表示
+  // 如果action是移入的时候，stateGroup代表移入状态，通过stateGroup的state表示
   private final Group group;
 
   // 当action是归约的时候，production就是归约的产生式
@@ -76,7 +76,7 @@ public static  final  String TYPE_ERROR = "error";
     return type;
   }
 
-  public Group getItem() {
+  public Group getGroup() {
     return group;
   }
 

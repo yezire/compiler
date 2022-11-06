@@ -10,7 +10,10 @@ public class TestCreatTable {
   @Test
   public void test(){
     Grammar preprocess =new Grammar();
-    preprocess.inputGrammar();
+    // String path ="/Users/yezizhi/Desktop/compiler/src/syntax/grammarTest.txt";
+    String path = "src/test/myTestGrammar.txt";
+    // String path = "src/test/grammarTest.txt";
+    preprocess.inputGrammar(path);
     LR0.createTable();
     LR0.getTable().entrySet().forEach(this::show);
 

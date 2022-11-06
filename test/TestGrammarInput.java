@@ -6,8 +6,11 @@ import syntax.Grammar;
 public class TestGrammarInput {
   @Test
   public void test() {
+    // String path ="/Users/yezizhi/Desktop/compiler/src/syntax/grammarTest.txt";
+    String path = "src/test/myTestGrammar.txt";
+    // String path = "src/test/grammarTest.txt";
     Grammar preprocess =new Grammar();
-    preprocess.inputGrammar();
+    preprocess.inputGrammar(path);
 
     System.out.println("================Terminal===============");
     Grammar.getTerminals().forEach(System.out::println);

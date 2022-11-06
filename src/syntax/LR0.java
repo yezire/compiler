@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
+import lexical_analysis.Token;
 
 /**
  * lr0
@@ -26,6 +27,7 @@ public class LR0 {
   static Map<Group, Map<String, Action>> table = new HashMap<>();//分析表 K :状态 行 V：{符号 列, action 格子 }
   static Group startGroup;
   static Production startProduction;
+  static List<Group> allGroups;
   static Set<String> allVars = new HashSet<>();
 
 
@@ -43,7 +45,7 @@ public class LR0 {
     while (!stack.isEmpty()) {
       Item item = stack.pop();
       //圆点后面是终结符，不会继续拓展
-      if (Grammar.getTerminals().contains(item.getPosVar()) || item.getPosVar().equals(";")) {
+      if (Grammar.getTerminals().contains(item.getPosVar()) || item.getPosVar().equals("END")) {
         continue;
       } else {
         List<Production> productions = Grammar.getProductionsByLeft().get(item.getPosVar());
@@ -150,15 +152,15 @@ public class LR0 {
 
   public static void createTable() {
 //求出所有项目集
-    List<Group> allGroups = getAllGroups();
-    for (Group group : allGroups) {
+    allGroups = getAllGroups();
 
+    for (Group group : allGroups) {
 
       for (String var : allVars) {
         //终结符 action表
         if (Grammar.getTerminals().contains(var)) {
           //接受 acc
-          if(var.equals("#")&&group.isAccGroup()){
+          if (var.equals("#") && group.isAccGroup()) {
             addToDoubleMap(table, group, var, Action.createAcc());
           }
           // 归约 r
@@ -176,14 +178,14 @@ public class LR0 {
         }
         //goto表
         if (Grammar.getNonTerminals().contains(var)) {
-          if( GOTO_TABLE.containsKey(group)){
+          if (GOTO_TABLE.containsKey(group)) {
             Group next = GOTO_TABLE.get(group).get(var);
             if (next != null) {
               addToDoubleMap(table, group, var, Action.createGoto(next));
             } else {
               addToDoubleMap(table, group, var, Action.createError());
             }
-          }else{
+          } else {
             addToDoubleMap(table, group, var, Action.createError());
           }
         }
@@ -191,29 +193,111 @@ public class LR0 {
     }
   }
 
-  public static void showTable(){
+  public static void showTable() {
 //    static Map<Group, Map<String, Action>> table = new HashMap<>();//分析表 K :状态 行 V：{符号 列, action 格子 }
     //print表头
-    StringBuilder sb=new StringBuilder();
+    StringBuilder sb = new StringBuilder();
     sb.append("=========================TABLE=================\n");
     sb.append("state").append("\t\t");
-    for(String var: Grammar.getTerminals()){
+    for (String var : Grammar.getTerminals()) {
       sb.append(var).append("\t\t");
     }
-    for(String var: Grammar.getNonTerminals()){
+    for (String var : Grammar.getNonTerminals()) {
       sb.append(var).append("\t\t");
     }
     sb.append("\n");
-    for (Entry<Group,Map<String,Action>> row :table.entrySet()) {
+    for (Entry<Group, Map<String, Action>> row : table.entrySet()) {
       sb.append(row.getKey().getId()).append("\t\t\t");
-      for(Entry<String,Action>grid:row.getValue().entrySet()){
-      sb.append(grid.getValue()).append("\t");
+      for (Entry<String, Action> grid : row.getValue().entrySet()) {
+        sb.append(grid.getValue()).append("\t");
       }
       sb.append("\n");
     }
     System.out.println(sb.toString());
   }
 
+  public static void match(List<String> inputTokens) {
+    //状态栈（状态==项目集）
+    Stack<Group> stateStack = new Stack<>();
+    //放入开始状态
+    stateStack.push(startGroup);
+    //符号栈
+    Stack<String> opStack = new Stack<>();
+    //放入结束符号
+    opStack.push("#");
+    //当前步骤
+    int step = 1;
+    //当前面临符号的位置
+    int pos = 0;
 
+    while (true) {
+      // 当前状态栈栈顶状态
+      Group currentStatus = stateStack.peek();
+      //当前面临符号
+    //  String currentInput = inputTokens.get(pos);
+      // 获取当前栈顶状态遇到输入符号得到的 action
+      Action action = table.get(currentStatus).get( inputTokens.get(pos));
+      if(action == null){
+        System.out.println("ssss");
+      }
+      if (action.isAcc()) {
+        // 当输入字符是最后一个字符，表示匹配成功。否则输入字符还没有匹配完成，匹配失败
+        if (pos == inputTokens.size() - 1) {
+          showStep(step++, opStack.peek(),inputTokens.get(pos), "accept");
+        } else {
+          showStep(step++, opStack.peek(), inputTokens.get(pos), "error");
+        }
+        return;
+      }else if(action.isError()){
+        System.out.println("!error!");
+        return;
+      }
+      //移进
+      else if (action.isS()) {
+        stateStack.push(action.getGroup());
+        opStack.push(inputTokens.get(pos));
+        pos++;
+        showStep(step++, opStack.peek(), inputTokens.get(pos), "move");
+      } else if (action.isR()) {
+        // 归约操作的产生式
+        Production production = action.getProduction();
+        int size = production.getRight().size();
+        // 记录状态栈弹出的状态
+        List<Integer> popStates = new ArrayList<>();
+        //记录弹出的符号
+        List<String> popVars = new ArrayList<>();
+        // 根据产生式右部的字符数量，从状态栈和字符栈中弹出对应数量的元素
+        for (int index = 0; index < size; index++) {
+          popStates.add(stateStack.pop().getId());
+          popVars.add(opStack.pop());
+        }
+        // 将产生式左部添加到字符栈
+        opStack.push(production.getLeft());
+        // 获取这个字符在 table 中对应的状态，添加到状态栈
+        Action gotoAction = table.get(stateStack.peek()).get(opStack.peek());
+        if (gotoAction.isGoto()) {
+          Group gotoState = gotoAction.getGroup();
+          stateStack.push(gotoState);
+          showStep(step++, opStack.peek(), inputTokens.get(pos), "reduction");
+        } else {
+          System.out.println("something is wrong");
+        }
+      }
+    }
+  }
+
+  public static void showStep(int step, String opVar, String inputVar, String info) {
+//    String actionName;
+//    if (action.isAcc()) {
+//      actionName = "accept";
+//    } else if (action.isS()) {
+//      actionName = "move";
+//    } else if (action.isR()) {
+//      actionName = "reduction";
+//    } else {
+//      actionName = "error";
+//    }
+    System.out.println(step + "\t" + opVar + "#" + inputVar + "\t" + info);
+  }
 
 }

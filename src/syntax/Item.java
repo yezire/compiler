@@ -18,7 +18,7 @@ public class Item implements Comparable<Item> {
  // public static final String ITEM_SYMBOL = "•";//圆点
   private final Production production;//对应产生式
   private final int pos;//圆点位置
-  private static final String END=";";
+  private static final String END="END";
   private  final String posVar;
   private final List<String> label;
 
@@ -51,15 +51,15 @@ public class Item implements Comparable<Item> {
     List<String>list = new ArrayList<>();
     list.add(production.getLeft());
     String posSymbol = null;
-    for (int index = 0; index < production.getRights().size(); index++) {
-      String symbol = production.getRights().get(index);
+    for (int index = 0; index < production.getRight().size(); index++) {
+      String symbol = production.getRight().get(index);
       if (index == pos) {
         posSymbol = symbol;
         list.add(ITEM_SYMBOL);
       }
       list.add(symbol);
     }
-    if (pos == production.getRights().size()) {
+    if (pos == production.getRight().size()) {
       posSymbol = END;
       list.add(ITEM_SYMBOL);
     }
