@@ -60,9 +60,11 @@ public class Group {
   }
 
   public boolean isAccGroup(){
-    for(Item item:itemSet){
-      if (Grammar.getStart().equals(item.getProduction().getLeft())){
-        return true;
+    if(itemSet.size()==1){
+      for(Item item:itemSet){
+        if ( Grammar.getStart().equals(item.getProduction().getLeft())){
+          return true;
+        }
       }
     }
     return false;

@@ -52,6 +52,8 @@ public class Grammar {
         terminals.addAll(right);
       }
       terminals.removeIf(s -> nonTerminals.contains(s));
+      //remove $
+      terminals.remove("$");
       //add #
       terminals.add("#");
       generateProductionsByLeft();

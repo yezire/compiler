@@ -164,6 +164,7 @@ public class LR0 {
         if (Grammar.getTerminals().contains(var)) {
           //接受 acc
           if (var.equals("#") && group.isAccGroup()) {
+            //todo:bug
             addToDoubleMap(table, group, var, Action.createAcc());
             continue;
           }
@@ -200,9 +201,9 @@ public class LR0 {
         }
       }
     }
-    for(Group p:reductionGroup){
-      System.out.println(p.getId());
-    }
+//    for(Group p:reductionGroup){
+//      System.out.println(p.getId());
+//    }
   }
 
   public static void showTable() {
