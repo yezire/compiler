@@ -11,7 +11,7 @@ public class TestCreatTable {
   public void test(){
     Grammar preprocess =new Grammar();
     // String path ="/Users/yezizhi/Desktop/compiler/src/syntax/grammarTest.txt";
-    String path = "src/test/myTestGrammar.txt";
+    String path = "src/test/grammar.txt";
     // String path = "src/test/grammarTest.txt";
     preprocess.inputGrammar(path);
     LR0.createTable();

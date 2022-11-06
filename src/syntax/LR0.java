@@ -51,6 +51,7 @@ public class LR0 {
         List<Production> productions = Grammar.getProductionsByLeft().get(item.getPosVar());
         for (Production p : productions) {
           //创建产生式对应的项目
+          if(!p.isEmptyRight()){
           Item newItem = Item.createProduction(p);
           if (!result.contains(newItem)) {
             result.add(newItem);
@@ -58,6 +59,7 @@ public class LR0 {
             stack.push(newItem);
           }
         }
+      }
       }
     }
     return result;
@@ -153,6 +155,7 @@ public class LR0 {
   public static void createTable() {
 //求出所有项目集
     allGroups = getAllGroups();
+    Set<Group>reductionGroup=new HashSet<>();
 
     for (Group group : allGroups) {
 
@@ -166,6 +169,7 @@ public class LR0 {
           }
          //  归约 r
           else if (group.isReductionGroup()) {
+            reductionGroup.add(group);
             Production production = group.reProduction;
             addToDoubleMap(table, group, var, Action.createR(production));
           }
@@ -195,6 +199,9 @@ public class LR0 {
           }
         }
       }
+    }
+    for(Group p:reductionGroup){
+      System.out.println(p.getId());
     }
   }
 

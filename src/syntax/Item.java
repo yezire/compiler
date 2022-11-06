@@ -52,6 +52,9 @@ public class Item implements Comparable<Item> {
   }
 
   private static Item create(Production production, int pos) {
+    //todo
+    //compUint->$
+   // if(production.getRight().get(0).equals("$"))return null;
     List<String> list = new ArrayList<>();
     list.add(production.getLeft());
     String posSymbol = null;

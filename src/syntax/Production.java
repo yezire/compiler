@@ -12,11 +12,14 @@ private String left;
 private List<String> right;
 private int id;
 private  static int idPool=0;
+private boolean emptyRight;//compUnit -> $
 
-public Production(String left,List<String>right){
+
+  public Production(String left,List<String>right){
   this.left = left;
   this.right = right;
   this.id = idPool++;
+  emptyRight= right.get(0).equals("$");
 }
   public List<String> getRight(){
     return right;
@@ -28,4 +31,8 @@ public Production(String left,List<String>right){
 
   public  int getId(){return id;}
 
+
+  public boolean isEmptyRight() {
+    return emptyRight;
+  }
 }
