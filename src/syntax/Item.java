@@ -5,22 +5,19 @@ import java.util.List;
 import java.util.Objects;
 
 public class Item implements Comparable<Item> {
+
   /**
-   * 表示当前pos位置对应的字符。
-   * 例:产生式 S -> bBB
-   * 它有四个项目         •bBB b•BB  bB•B  bBB•
-   * pos 位置是            0    1     2    3
-   * 对应的posSymbol是     b    B     B    Symbol.END
-   * 对应的label是        •bBB  b•BB  bB•B   bBB•
-   *
+   * 表示当前pos位置对应的字符。 例:产生式 S -> bBB 它有四个项目         •bBB b•BB  bB•B  bBB• pos 位置是            0    1 2
+   * 3 对应的posSymbol是     b    B     B    Symbol.END 对应的label是        •bBB  b•BB  bB•B   bBB•
    */
   public static final String ITEM_SYMBOL = "•";//圆点
- // public static final String ITEM_SYMBOL = "•";//圆点
+  // public static final String ITEM_SYMBOL = "•";//圆点
   private final Production production;//对应产生式
   private final int pos;//圆点位置
-  private static final String END="END";
-  private  final String posVar;
+  private static final String END = "END";
+  private final String posVar;
   private final List<String> label;
+
 
   private Item(Production production, int pos, String posVar, List<String> label) {
     this.production = production;
@@ -29,8 +26,14 @@ public class Item implements Comparable<Item> {
     this.label = label;
   }
 
+  public boolean isReduction() {
+    return (label.indexOf("•") == label.size() - 1)
+        || (label.indexOf("•") == label.size() - 2 && label.get(label.size() - 1).equals("$"));
+  }
+
   /**
    * 创建产生式对应的移进项目
+   *
    * @param production
    * @return
    */
@@ -40,6 +43,7 @@ public class Item implements Comparable<Item> {
 
   /**
    * 创建当前项目 item 的后继项目
+   *
    * @param item
    * @return
    */
@@ -48,7 +52,7 @@ public class Item implements Comparable<Item> {
   }
 
   private static Item create(Production production, int pos) {
-    List<String>list = new ArrayList<>();
+    List<String> list = new ArrayList<>();
     list.add(production.getLeft());
     String posSymbol = null;
     for (int index = 0; index < production.getRight().size(); index++) {
@@ -90,8 +94,12 @@ public class Item implements Comparable<Item> {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     Item that = (Item) o;
     return this.toString().equals(that.toString());
   }
@@ -99,7 +107,7 @@ public class Item implements Comparable<Item> {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    for(String l:label){
+    for (String l : label) {
       sb.append(l);
     }
     return sb.toString();

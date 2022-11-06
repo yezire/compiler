@@ -20,7 +20,7 @@ public class SyntaxAnalysis {
   public static void main(String[] args) {
     //输入文件
     String path = "src/test/test1.txt";
-  String grammarPath = "src/test/myTestGrammar.txt";
+  String grammarPath = "src/test/grammar.txt";
    // String grammarPath = "src/test/grammar.txt";
 
     //lex
@@ -42,9 +42,11 @@ public class SyntaxAnalysis {
     LR0.createTable();
 
     //analysis
-List<String> testString= Arrays.asList("i", "*", "i","+","i");
-LR0.match(testString);
-    //LR0.match(tokens2string(TokenTable.getTokens()));
+//List<String> testString= Arrays.asList("i", "*", "i","+","i");
+    //#####!
+   // List<String> testString= Arrays.asList("a", "c", "d","#");
+//LR0.match(testString);
+    LR0.match(tokens2string(TokenTable.getTokens()));
 
   }
 
@@ -69,6 +71,7 @@ LR0.match(testString);
           break;
       }
     }
+    strings.add("#");
     return strings;
   }
 

@@ -2,6 +2,7 @@ package syntax;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -14,13 +15,20 @@ public class Group {
   private final Set<Item> itemSet;//项目集合
   private final String label;
   public static final Map<String, Group> allGroups = new HashMap<>();//记录所有规范项目族
-  public Production reProduction;//归约产生式，只有归约group才有
+  public   Production reProduction;
 
+//  public Set<Item> getReductionItems() {
+//    return reductionItems;
+//  }
 
   private Group(int id, Set<Item> itemSet, String label) {
     this.id = id;
     this.itemSet = itemSet;
     this.label = label;
+  }
+
+  public Set<Item> getItemSet() {
+    return itemSet;
   }
 
   public static Group create(Set<Item> items) {
@@ -59,15 +67,22 @@ public class Group {
     }
     return false;
   }
+public  boolean isReductionGroup(){
+    if(collectReductionItems().size()!=0){
+      return  true;
+    }else  return false;
+}
 
-  public boolean isReductionGroup() {
+
+  public Set<Item> collectReductionItems() {
+    Set<Item>reductionItems = new HashSet<>();
     for (Item item : itemSet) {
-      if (item.getLabel().indexOf("•") != item.getLabel().size() - 1) {
-        return false;
+      if (item.isReduction()) {
+       reductionItems.add(item);
+       reProduction=item.getProduction();
       }
     }
-    reProduction = new ArrayList<>(itemSet).get(0).getProduction();
-    return true;
+    return  reductionItems;
   }
 
 

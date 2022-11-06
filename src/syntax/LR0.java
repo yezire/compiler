@@ -162,14 +162,19 @@ public class LR0 {
           //接受 acc
           if (var.equals("#") && group.isAccGroup()) {
             addToDoubleMap(table, group, var, Action.createAcc());
+            continue;
           }
-          // 归约 r
+         //  归约 r
           else if (group.isReductionGroup()) {
             Production production = group.reProduction;
             addToDoubleMap(table, group, var, Action.createR(production));
           }
+//          for(Item item: group.collectReductionItems()){
+//            addToDoubleMap(table, group, var, Action.createR(item.getProduction()));
+//          }
+
           // 移进 s
-          else if (GOTO_TABLE.get(group).containsKey(var)) {
+         else if (GOTO_TABLE.get(group).containsKey(var)) {
             Group next = GOTO_TABLE.get(group).get(var);
             addToDoubleMap(table, group, var, Action.createS(next));
           } else {
@@ -234,21 +239,22 @@ public class LR0 {
       // 当前状态栈栈顶状态
       Group currentStatus = stateStack.peek();
       //当前面临符号
-    //  String currentInput = inputTokens.get(pos);
+      //  String currentInput = inputTokens.get(pos);
       // 获取当前栈顶状态遇到输入符号得到的 action
-      Action action = table.get(currentStatus).get( inputTokens.get(pos));
-      if(action == null){
+      Action action = table.get(currentStatus).get(inputTokens.get(pos));
+      if (action == null) {
         System.out.println("ssss");
       }
       if (action.isAcc()) {
         // 当输入字符是最后一个字符，表示匹配成功。否则输入字符还没有匹配完成，匹配失败
         if (pos == inputTokens.size() - 1) {
-          showStep(step++, opStack.peek(),inputTokens.get(pos), "accept");
+          showStep(step++, opStack.peek(), inputTokens.get(pos), "accept");
         } else {
           showStep(step++, opStack.peek(), inputTokens.get(pos), "error");
         }
         return;
-      }else if(action.isError()){
+      }
+      else if (action.isError()) {
         System.out.println("!error!");
         return;
       }
@@ -268,6 +274,7 @@ public class LR0 {
         List<String> popVars = new ArrayList<>();
         // 根据产生式右部的字符数量，从状态栈和字符栈中弹出对应数量的元素
         for (int index = 0; index < size; index++) {
+          if(production.getRight().get(index).equals("$"))continue;
           popStates.add(stateStack.pop().getId());
           popVars.add(opStack.pop());
         }
