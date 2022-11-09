@@ -1,8 +1,9 @@
-package syntax;
+package syntax.syntaxLR;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import syntax.Production;
 
 public class Item implements Comparable<Item> {
 

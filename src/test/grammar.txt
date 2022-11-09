@@ -35,7 +35,6 @@ stmt -> return argExp ;
 argExp -> $
 argExp -> exp
 exp -> assignExp
-lVal -> Ident
 primaryExp -> ( exp )
 primaryExp -> number
 number -> INT

@@ -3,15 +3,14 @@ package syntax;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Stack;
 import lexical_analysis.DFA;
-import lexical_analysis.DFAtoMFA;
 import lexical_analysis.Lexer;
 import lexical_analysis.NFA;
 import lexical_analysis.Token;
 import lexical_analysis.TokenTable;
+import syntax.Grammar;
+import syntax.syntaxLR.LR0;
 
 public class SyntaxAnalysis {
 
@@ -39,14 +38,17 @@ public class SyntaxAnalysis {
     //syntax
     Grammar preprocess = new Grammar();
     preprocess.inputGrammar(grammarPath);
-    LR0.createTable();
+
+    preprocess.generateFirstCollection();
+
+   // LR0.createTable();
 
     //analysis
 //List<String> testString= Arrays.asList("i", "*", "i","+","i");
     //#####!
    // List<String> testString= Arrays.asList("a", "c", "d","#");
 //LR0.match(testString);
-    LR0.match(tokens2string(TokenTable.getTokens()));
+  //  LR0.match(tokens2string(TokenTable.getTokens()));
 
   }
 

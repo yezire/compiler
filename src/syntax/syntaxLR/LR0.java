@@ -1,4 +1,4 @@
-package syntax;
+package syntax.syntaxLR;
 
 
 import java.util.ArrayList;
@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
-import lexical_analysis.Token;
+import syntax.Grammar;
+import syntax.Production;
 
 /**
  * lr0
@@ -29,6 +30,7 @@ public class LR0 {
   static Production startProduction;
   static List<Group> allGroups;
   static Set<String> allVars = new HashSet<>();
+  static Set<Group>reductionGroup=new HashSet<>();
 
 
   /**
@@ -155,7 +157,7 @@ public class LR0 {
   public static void createTable() {
 //求出所有项目集
     allGroups = getAllGroups();
-    Set<Group>reductionGroup=new HashSet<>();
+
 
     for (Group group : allGroups) {
 
@@ -164,7 +166,6 @@ public class LR0 {
         if (Grammar.getTerminals().contains(var)) {
           //接受 acc
           if (var.equals("#") && group.isAccGroup()) {
-            //todo:bug
             addToDoubleMap(table, group, var, Action.createAcc());
             continue;
           }

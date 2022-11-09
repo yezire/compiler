@@ -1,10 +1,10 @@
 import java.util.Map;
 import java.util.Map.Entry;
 import org.junit.Test;
-import syntax.Action;
+import syntax.syntaxLR.Action;
 import syntax.Grammar;
-import syntax.Group;
-import syntax.LR0;
+import syntax.syntaxLR.Group;
+import syntax.syntaxLR.LR0;
 
 public class TestCreatTable {
   @Test

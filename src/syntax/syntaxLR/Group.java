@@ -1,12 +1,12 @@
-package syntax;
+package syntax.syntaxLR;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import syntax.Grammar;
+import syntax.Production;
 
 public class Group {
 
@@ -15,7 +15,7 @@ public class Group {
   private final Set<Item> itemSet;//项目集合
   private final String label;
   public static final Map<String, Group> allGroups = new HashMap<>();//记录所有规范项目族
-  public   Production reProduction;
+  public Production reProduction;
 
 //  public Set<Item> getReductionItems() {
 //    return reductionItems;

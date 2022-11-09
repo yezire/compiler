@@ -1,4 +1,6 @@
-package syntax;
+package syntax.syntaxLR;
+
+import syntax.Production;
 
 /**
  * SLR1对应的动作

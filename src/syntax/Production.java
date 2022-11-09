@@ -15,6 +15,7 @@ private  static int idPool=0;
 private boolean emptyRight;//compUnit -> $
 
 
+
   public Production(String left,List<String>right){
   this.left = left;
   this.right = right;
@@ -35,4 +36,6 @@ private boolean emptyRight;//compUnit -> $
   public boolean isEmptyRight() {
     return emptyRight;
   }
+
+
 }
