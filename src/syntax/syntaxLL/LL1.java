@@ -16,7 +16,8 @@ public class LL1 {
 
   //k:left v:candidate productions 拓展之后的也在里面，Grammar.productions是原始产生式
   private static Map<String, List<Production>> allProductions = new HashMap<>();
-  private  static  Map<String,Map<String,Production>>ll1Table = new HashMap<>();;
+  private static Map<String, Map<String, Production>> ll1Table = new HashMap<>();
+  ;
 
 
   public void initProductions() {
@@ -70,12 +71,12 @@ public class LL1 {
         String ci = candidates.get(i).getRight().get(0);
         String cj = candidates.get(j).getRight().get(0);
         if (ci.equals(cj) && !ci.equals("$")) {
-          System.out.println("存在");
+         // System.out.println("存在");
           return true;
         }
       }
     }
-    System.out.println("不存在");
+    //System.out.println("不存在");
     return false;
   }
 
@@ -100,7 +101,7 @@ public class LL1 {
         for (int j = i + 1; j < lists.size(); j++) {
           Set<String> ci = lists.get(i);
           Set<String> cj = lists.get(j);
-          if (!Collections.disjoint(ci,cj)) {
+          if (!Collections.disjoint(ci, cj)) {
             System.out.println("首符集存在交集");
             return false;
           }
@@ -110,15 +111,15 @@ public class LL1 {
     System.out.println("首符集不存在交集");
 
     //判断若存在某个候选首符集包含ε的非终结符的first集和follow集不相交
-for(String vn:Grammar.getNonTerminals()){
-  Set<String>first=Grammar.getFirst().get(vn);
-  if(first.contains("$")){
-   Set<String>follow=Grammar.getFollow().get(vn);
-    if(!Collections.disjoint(follow,first)){
-      System.out.println("有交集");
+    for (String vn : Grammar.getNonTerminals()) {
+      Set<String> first = Grammar.getFirst().get(vn);
+      if (first.contains("$")) {
+        Set<String> follow = Grammar.getFollow().get(vn);
+        if (!Collections.disjoint(follow, first)) {
+          System.out.println("有交集");
+        }
+      }
     }
-  }
-}
     System.out.println("first集和follow集不相交");
     return true;
   }
@@ -131,35 +132,36 @@ for(String vn:Grammar.getNonTerminals()){
      • 若a∈FIRST(αi)，则指派αi去执行匹配任务。 • 若a不属于任何一个候选首字符集，则:
      • 若ε属于某个FIRST(αi)，且a∈FOLLOW(A)，则让A与ε自动匹配; • 否则，a的出现是一种语法错误。
      */
-    for(String vn:Grammar.getNonTerminals()){
+    for (String vn : Grammar.getNonTerminals()) {
       //row
-      Map<String,Production>row=new HashMap<>();
-      for(String vt:Grammar.getTerminals()){
+      Map<String, Production> row = new HashMap<>();
+      for (String vt : Grammar.getTerminals()) {
         //col
-        List<Production>candidates=allProductions.get(vn);
-        boolean change=false;
+        List<Production> candidates = allProductions.get(vn);
+        boolean change = false;
 
-        Production emptyProduction=null;
+        Production emptyProduction = null;
         //若a∈FIRST(αi)，则指派αi去执行匹配任务。
-        for(Production p:candidates){
-          if(Grammar.getFirstByString(p.getRight()).contains(vt)){
-            row.put(vt,p);
-            change=true;
+        for (Production p : candidates) {
+          if (Grammar.getFirstByString(p.getRight()).contains(vt)) {
+            row.put(vt, p);
+            change = true;
           }
-          if(Grammar.getFirstByString(p.getRight()).contains("$")){
-            emptyProduction=p;
+          if (Grammar.getFirstByString(p.getRight()).contains("$")) {
+            emptyProduction = p;
           }
         }
         //若a不属于任何一个候选首字符集，则:若ε属于某个FIRST(αi)，且a∈FOLLOW(A)，则让A与ε自动匹配;
-        if(!change){
-          if(emptyProduction!=null&&Grammar.getFollow().get(vn).contains(vt)){
-            row.put(vt,emptyProduction);
-          }else{
+        if (!change) {
+          if (emptyProduction != null && Grammar.getFollow().get(vn).contains(vt)) {
+            row.put(vt, emptyProduction);
+          } else {
             //todo:error
+
           }
         }
       }
-      ll1Table.put(vn,row);
+      ll1Table.put(vn, row);
     }
 
   }
@@ -176,9 +178,48 @@ for(String vn:Grammar.getNonTerminals()){
      * 若M[X,a]中存放着“出错标志”，则调用出错 诊断程序ERROR。
      */
     int step = 0;//步骤
+    int pos = 0;
     Stack<String> varStack = new Stack<String>();//分析栈
-    //todo:push start
+    varStack.push("#");
+    varStack.push(Grammar.getStart());
     input.add("#");
+    while (true) {
+      if(step==9){
+        System.out.println("here");
+      }
+      if (Grammar.getTerminals().contains(varStack.peek())) {
+        if (varStack.peek().equals(input.get(pos))) {
+          //若X = a = ‘#’，则宣布分析成功，停止分析过程。
+          if (input.get(pos).equals("#")) {
+            System.out.println(step+"\t"+varStack.peek()+"#"+input.get(pos)+"\t"+"accept");
+            return;
+          } else {
+            //若X = a ≠‘#’，则把X从STACK栈顶弹出，让a指向下一个输入符号。
+            System.out.println(step++ +"\t"+varStack.peek()+"#"+input.get(pos)+"\t"+"move");
+            varStack.pop();
+            pos++;
+          }
+        }
+      } else {
+        //若X是一个非终结符，则查看分析表M。若M[X,a]中存放着关于X的一个产生式，
+        // 那么，先把X弹出STACK栈顶，然后把产生式的右部符号串按反序一一推进STACK栈(若右部符号为ε，则意味着不推任何符号进栈)。
+        Production p = ll1Table.get(varStack.peek()).get(input.get(pos));
+        if (p == null) {
+          error();
+          return;
+        } else {
+          System.out.println(step++ +"\t"+varStack.peek()+"#"+input.get(pos)+"\t"+"reduction");
+          varStack.pop();
+          List<String> right = p.getRight();
+          for (int i = right.size() - 1; i >= 0; i--) {
+            if(right.get(i).equals("$"))continue;
+            varStack.push(right.get(i));
+          }
+        }
+      }
+
+    }
+
 
   }
 

@@ -48,7 +48,7 @@ public class SyntaxAnalysis {
     //#####!
    // List<String> testString= Arrays.asList("a", "c", "d","#");
 //LR0.match(testString);
-  //  LR0.match(tokens2string(TokenTable.getTokens()));
+//    LR0.match(tokens2string(TokenTable.getTokens()));
 
   }
 
