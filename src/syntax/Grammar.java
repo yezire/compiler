@@ -167,7 +167,7 @@ public class Grammar {
       int afterFollowSize = 0;
       // 求得所有非终结符的Follow集
       for (String character : nonTerminals) {
-        if (character.equals("decl")) {
+        if (character.equals("unaryExp")) {
           System.out.println("here");
         }
         generateFollow(character);
@@ -211,7 +211,7 @@ public class Grammar {
         }
         else {
           //若 A  → aBβ是一个产生式， 则把 FIRST(β) \ ϵ  加至 FOLLOW(B) 中.
-          Set<String> temp = getFirstSet(p.getRight().subList(index+1, p.getRight().size()));
+          Set<String> temp = getFirstByString(p.getRight().subList(index+1, p.getRight().size()));
           if (temp.contains("$")) {
             temp.remove("$");
             set.addAll(temp);
@@ -236,8 +236,9 @@ public class Grammar {
 
   }
 
-  public static Set<String> getFirstSet(List<String> ori) {
+  public static Set<String> getFirstByString(List<String> ori) {
     //求一个串的first集合
+
     //终结符，add 停止
     //非终结符 加入第一个的first集合  若全为终结符 停止
     //若有空，下一个符号
@@ -249,6 +250,10 @@ public class Grammar {
         break;
       }
       set.addAll(first.get(ori.get(index + 1)));
+      if(!first.get(ori.get(index + 1)).contains("$")){
+        set.remove("$");
+        break;
+      }
       index++;
 
     }

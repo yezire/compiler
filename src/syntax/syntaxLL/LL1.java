@@ -16,6 +16,7 @@ public class LL1 {
 
   //k:left v:candidate productions 拓展之后的也在里面，Grammar.productions是原始产生式
   private static Map<String, List<Production>> allProductions = new HashMap<>();
+  private  static  Map<String,Map<String,Production>>ll1Table = new HashMap<>();;
 
 
   public void initProductions() {
@@ -107,6 +108,18 @@ public class LL1 {
       }
     }
     System.out.println("首符集不存在交集");
+
+    //判断若存在某个候选首符集包含ε的非终结符的first集和follow集不相交
+for(String vn:Grammar.getNonTerminals()){
+  Set<String>first=Grammar.getFirst().get(vn);
+  if(first.contains("$")){
+   Set<String>follow=Grammar.getFollow().get(vn);
+    if(!Collections.disjoint(follow,first)){
+      System.out.println("有交集");
+    }
+  }
+}
+    System.out.println("first集和follow集不相交");
     return true;
   }
 
@@ -118,6 +131,37 @@ public class LL1 {
      • 若a∈FIRST(αi)，则指派αi去执行匹配任务。 • 若a不属于任何一个候选首字符集，则:
      • 若ε属于某个FIRST(αi)，且a∈FOLLOW(A)，则让A与ε自动匹配; • 否则，a的出现是一种语法错误。
      */
+    for(String vn:Grammar.getNonTerminals()){
+      //row
+      Map<String,Production>row=new HashMap<>();
+      for(String vt:Grammar.getTerminals()){
+        //col
+        List<Production>candidates=allProductions.get(vn);
+        boolean change=false;
+
+        Production emptyProduction=null;
+        //若a∈FIRST(αi)，则指派αi去执行匹配任务。
+        for(Production p:candidates){
+          if(Grammar.getFirstByString(p.getRight()).contains(vt)){
+            row.put(vt,p);
+            change=true;
+          }
+          if(Grammar.getFirstByString(p.getRight()).contains("$")){
+            emptyProduction=p;
+          }
+        }
+        //若a不属于任何一个候选首字符集，则:若ε属于某个FIRST(αi)，且a∈FOLLOW(A)，则让A与ε自动匹配;
+        if(!change){
+          if(emptyProduction!=null&&Grammar.getFollow().get(vn).contains(vt)){
+            row.put(vt,emptyProduction);
+          }else{
+            //todo:error
+          }
+        }
+      }
+      ll1Table.put(vn,row);
+    }
+
   }
 
   public void analysis(List<String> input) {

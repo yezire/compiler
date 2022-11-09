@@ -14,7 +14,7 @@ public class TestLL1 {
     ll.initProductions();
    ll.extract();
    ll.isLL1();
-
+ll.createTable();
     System.out.println("test1");
 
   }
