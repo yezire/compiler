@@ -13,6 +13,7 @@ private List<String> right;
 private int id;
 private  static int idPool=0;
 private boolean emptyRight;//compUnit -> $
+  private boolean isSynch=false;
 
 
 
@@ -37,5 +38,12 @@ private boolean emptyRight;//compUnit -> $
     return emptyRight;
   }
 
+public Production(String synch){
+    //LL1文法中同步符号
+    isSynch=true;
+}
 
+  public boolean isSynch() {
+    return isSynch;
+  }
 }

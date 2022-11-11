@@ -71,7 +71,7 @@ public class LL1 {
         String ci = candidates.get(i).getRight().get(0);
         String cj = candidates.get(j).getRight().get(0);
         if (ci.equals(cj) && !ci.equals("$")) {
-         // System.out.println("存在");
+          // System.out.println("存在");
           return true;
         }
       }
@@ -133,8 +133,11 @@ public class LL1 {
      • 若ε属于某个FIRST(αi)，且a∈FOLLOW(A)，则让A与ε自动匹配; • 否则，a的出现是一种语法错误。
      */
     for (String vn : Grammar.getNonTerminals()) {
+
       //row
+      //vt p
       Map<String, Production> row = new HashMap<>();
+
       for (String vt : Grammar.getTerminals()) {
         //col
         List<Production> candidates = allProductions.get(vn);
@@ -156,14 +159,30 @@ public class LL1 {
           if (emptyProduction != null && Grammar.getFollow().get(vn).contains(vt)) {
             row.put(vt, emptyProduction);
           } else {
-            //todo:error
-
+//            //todo:error
+//            if(emptyProduction == null){
+//              for (String b : Grammar.getFollow().get(vn)) {
+//                row.put(b, new Production("synch"));
+//              }
+//            }
           }
         }
       }
       ll1Table.put(vn, row);
     }
 
+    //synch
+    for (String vn : Grammar.getNonTerminals()) {
+      //row
+      Map<String, Production> row = ll1Table.get(vn);
+      for (String f : Grammar.getFollow().get(vn)) {
+        if (row.get(f) == null) {
+          row.put(f, new Production("synch"));
+          //  System.out.println("vn: "+vn+" vt: "+f);
+        }
+      }
+      ll1Table.replace(vn, row);
+    }
   }
 
   public void analysis(List<String> input) {
@@ -184,35 +203,61 @@ public class LL1 {
     varStack.push(Grammar.getStart());
     input.add("#");
     while (true) {
-      if(step==9){
+      if (step == 9) {
         System.out.println("here");
       }
       if (Grammar.getTerminals().contains(varStack.peek())) {
         if (varStack.peek().equals(input.get(pos))) {
           //若X = a = ‘#’，则宣布分析成功，停止分析过程。
           if (input.get(pos).equals("#")) {
-            System.out.println(step+"\t"+varStack.peek()+"#"+input.get(pos)+"\t"+"accept");
+            System.out.println(
+                step + "\t" + varStack.peek() + "#" + input.get(pos) + "\t" + "accept");
             return;
           } else {
             //若X = a ≠‘#’，则把X从STACK栈顶弹出，让a指向下一个输入符号。
-            System.out.println(step++ +"\t"+varStack.peek()+"#"+input.get(pos)+"\t"+"move");
+            System.out.println(
+                step++ + "\t" + varStack.peek() + "#" + input.get(pos) + "\t" + "move");
             varStack.pop();
             pos++;
           }
+        } else {
+          // 若栈顶的终结符号不匹配输入符号，则弹出栈顶的终结符。
+          varStack.pop();
+          System.out.println(
+              step++ + "\t" + varStack.peek() + "#" + input.get(pos) + "\t" + "栈顶的终结符号不匹配输入符号,弹出栈");
+
         }
       } else {
         //若X是一个非终结符，则查看分析表M。若M[X,a]中存放着关于X的一个产生式，
         // 那么，先把X弹出STACK栈顶，然后把产生式的右部符号串按反序一一推进STACK栈(若右部符号为ε，则意味着不推任何符号进栈)。
         Production p = ll1Table.get(varStack.peek()).get(input.get(pos));
-        if (p == null) {
-          error();
-          return;
+        if (p == null || p.isSynch() == true) {
+          if( p.isSynch() == true) {
+            //如果栈顶为文法开始符号,跳过输入符号
+            if (varStack.peek().equals(Grammar.getStart())) {
+              pos++;
+            }
+            varStack.pop();
+            System.out.println(
+                step++ + "\t" + varStack.peek() + "#" + input.get(pos) + "\t" + "synch,"
+                    + varStack.peek() + "已弹出栈");
+
+          } else {
+            //若发现M[A,a]为空则跳过输入符号a；
+            pos++;
+            System.out.println(
+                step++ + "\t" + varStack.peek() + "#" + input.get(pos) + "\t" + "空,跳过当前输入符号");
+          }
+
         } else {
-          System.out.println(step++ +"\t"+varStack.peek()+"#"+input.get(pos)+"\t"+"reduction");
+          System.out.println(
+              step++ + "\t" + varStack.peek() + "#" + input.get(pos) + "\t" + "reduction");
           varStack.pop();
           List<String> right = p.getRight();
           for (int i = right.size() - 1; i >= 0; i--) {
-            if(right.get(i).equals("$"))continue;
+            if (right.get(i).equals("$")) {
+              continue;
+            }
             varStack.push(right.get(i));
           }
         }
