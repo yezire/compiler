@@ -6,9 +6,9 @@ import syntax.Grammar;
 public class TestGrammarInput {
   @Test
   public void test() {
-    // String path ="/Users/yezizhi/Desktop/compiler/src/syntax/grammarTest.txt";
-    String path = "src/test/myTestGrammar.txt";
-    // String path = "src/test/grammarTest.txt";
+    // String path ="/Users/yezizhi/Desktop/compiler/src/syntax/grammarTestLR.txt";
+    String path = "src/test/grammarTestSLR.txt";
+    // String path = "src/test/grammarTestLR.txt";
     Grammar preprocess =new Grammar();
     preprocess.inputGrammar(path);
 

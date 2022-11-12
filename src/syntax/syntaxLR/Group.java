@@ -16,6 +16,7 @@ public class Group {
   private final String label;
   public static final Map<String, Group> allGroups = new HashMap<>();//记录所有规范项目族
   public Production reProduction;
+  public static  Map<Integer,String> idMap = new HashMap<>();
 
 //  public Set<Item> getReductionItems() {
 //    return reductionItems;
@@ -45,7 +46,9 @@ public class Group {
      */
     Group itemSet = allGroups.get(label);
     if (itemSet == null) {
-      itemSet = new Group(idPool++, items, sb.toString());
+      Integer id=idPool++;
+      itemSet = new Group(id, items, sb.toString());
+      idMap.put(id,label);
       allGroups.put(label, itemSet);
     }
     return itemSet;
@@ -53,6 +56,10 @@ public class Group {
 
   public Set<Item> getGroup() {
     return itemSet;
+  }
+
+  public static   Group getGroupById(Integer id) {
+    return allGroups.get(idMap.get(id));
   }
 
   public int getId() {

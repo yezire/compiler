@@ -1,5 +1,6 @@
 package syntax;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,6 +16,12 @@ private  static int idPool=0;
 private boolean emptyRight;//compUnit -> $
   private boolean isSynch=false;
 
+  public static List<Production> getProductions() {
+    return productions;
+  }
+
+  private static List<Production>productions= new ArrayList<>();
+
 
 
   public Production(String left,List<String>right){
@@ -22,6 +29,7 @@ private boolean emptyRight;//compUnit -> $
   this.right = right;
   this.id = idPool++;
   emptyRight= right.get(0).equals("$");
+  productions.add(this);
 }
   public List<String> getRight(){
     return right;

@@ -5,3 +5,5 @@ A -> c A
 A -> d
 B -> c B
 B -> d
+C -> $
+A -> c C A

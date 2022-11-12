@@ -30,7 +30,6 @@ public class LR0 {
   static Production startProduction;
   static List<Group> allGroups;
   static Set<String> allVars = new HashSet<>();
-  static Set<Group>reductionGroup=new HashSet<>();
 
 
   /**
@@ -53,15 +52,15 @@ public class LR0 {
         List<Production> productions = Grammar.getProductionsByLeft().get(item.getPosVar());
         for (Production p : productions) {
           //创建产生式对应的项目
-          if(!p.isEmptyRight()){
-          Item newItem = Item.createProduction(p);
-          if (!result.contains(newItem)) {
-            result.add(newItem);
-            // 添加到栈中，新项目需要查找它的相同项目
-            stack.push(newItem);
+          if (!p.isEmptyRight()) {
+            Item newItem = Item.createProduction(p);
+            if (!result.contains(newItem)) {
+              result.add(newItem);
+              // 添加到栈中，新项目需要查找它的相同项目
+              stack.push(newItem);
+            }
           }
         }
-      }
       }
     }
     return result;
@@ -83,7 +82,7 @@ public class LR0 {
       }
     }
     // 当前项目集 group 遇到符号 var 的后继项目集合
-    Set<Item> nextItems = new HashSet<>();
+    Set<Item> nextGroup = new HashSet<>();
     for (Item item : current.getGroup()) {
       /**
        * 项目pos点的符号与 symbol 是否相同
@@ -93,20 +92,27 @@ public class LR0 {
       if (item.getPosVar().equals(var)) {
         // 将后继项目添加到nextItems
         Item nextItem = Item.nextByItem(item);
-        List<String> label = Item.nextByItem(item).getLabel();
-        nextItems.add(nextItem);
+//        if (!item.getPosVar().equals("END") && Grammar.getFirst().get(item.getPosVar())
+//            .contains("$")) {
+//          Item removeEpsilon = Item.removeEpsilon(item);
+//          if(removeEpsilon!=null)
+//          nextGroup.add(removeEpsilon);
+//        }
+        nextGroup.add(nextItem);
       }
     }
     // 如果nextItems为空，说明当前项目集没有 符号symbol的后继项目
-    if (nextItems.isEmpty()) {
+    if (nextGroup.isEmpty()) {
       return null;
     }
     // 创建后继项目集
-    Group gotoItemSet = Group.create(closures(nextItems));
+    Group gotoItemSet = Group.create(closures(nextGroup));
     // 存放到缓存中
     addToDoubleMap(GOTO_TABLE, current, var, gotoItemSet);
+
     return gotoItemSet;
   }
+
 
   public static <OuterK, InnerK, InnerV> InnerV addToDoubleMap(
       Map<OuterK, Map<InnerK, InnerV>> outerMap, OuterK outerK, InnerK innerK, InnerV innerV) {
@@ -121,6 +127,8 @@ public class LR0 {
   private static List<Group> getAllGroups() {
     allVars.addAll(Grammar.getTerminals());
     allVars.addAll(Grammar.getNonTerminals());
+    //添加结束符号
+    allVars.add("#");
 
     //求解I0
     startProduction = Grammar.getProductions().get(0);
@@ -135,99 +143,101 @@ public class LR0 {
     Stack<Group> stack = new Stack<>();
     stack.push(startGroup);
     while (!stack.isEmpty()) {
-      Group itemSet = stack.pop();
+      Group group = stack.pop();
       // 遍历所有符号
       for (String var : allVars) {
         // 当前项目集遇到字符var得到后继项目集
-        Group gotoItemSet = gotoState(itemSet, var);
+        if (var.equals("$")) {
+          continue;
+        }
+        Group nextGroup = gotoState(group, var);
         /**
-         * 如果得到的后继项目集gotoItemSet 在allItemSetList中没有，
+         * 如果得到的后继项目集group 在allGroupList中没有，
          * 那么代表它是全新的，那么添加进行。
          */
-        if (gotoItemSet != null && !allGroupsList.contains(gotoItemSet)) {
-          allGroupsList.add(gotoItemSet);
+        if (nextGroup != null && !allGroupsList.contains(nextGroup)) {
+          allGroupsList.add(nextGroup);
           // 新的项目集要添加到栈中，进行遍历
-          stack.push(gotoItemSet);
+          stack.push(nextGroup);
         }
       }
     }
     return allGroupsList;
   }
 
+  public static void completeGroups() {
+    for (Group group : allGroups) {
+      Set<Item> oris = new HashSet<>(group.getItemSet());
+      for (Item item : oris) {
+        // a-> b · c d , c->$
+        //a->b·d 加入group
+        if (!item.getPosVar().equals("END") && Grammar.getFirst().get(item.getPosVar())
+            .contains("$")) {
+          Item removeEpsilon = Item.removeEpsilon(item);
+          if (removeEpsilon != null) {
+            group.getItemSet().add(removeEpsilon);
+          }
+        }
+      }
+    }
+  }
+
+
   public static void createTable() {
 //求出所有项目集
     allGroups = getAllGroups();
-
-
+    completeGroups();
+    allGroups=getAllGroups();
     for (Group group : allGroups) {
-
-      for (String var : allVars) {
-        //终结符 action表
-        if (Grammar.getTerminals().contains(var)) {
-          //接受 acc
-          if (var.equals("#") && group.isAccGroup()) {
-            addToDoubleMap(table, group, var, Action.createAcc());
-            continue;
-          }
-         //  归约 r
-          else if (group.isReductionGroup()) {
-            reductionGroup.add(group);
-            Production production = group.reProduction;
-            addToDoubleMap(table, group, var, Action.createR(production));
-          }
-//          for(Item item: group.collectReductionItems()){
-//            addToDoubleMap(table, group, var, Action.createR(item.getProduction()));
-//          }
-
-          // 移进 s
-         else if (GOTO_TABLE.get(group).containsKey(var)) {
-            Group next = GOTO_TABLE.get(group).get(var);
-            addToDoubleMap(table, group, var, Action.createS(next));
-          } else {
-            addToDoubleMap(table, group, var, Action.createError());
-          }
-        }
+      //acc group
+      if (group.getId() == 120) {
+        System.out.println("here");
+      }
+      if (group.isAccGroup()) {
+        addToDoubleMap(table, group, "#", Action.createAcc());
+        continue;
+      }
+      Map<String, Action> row = new HashMap<String, Action>();
+      table.put(group, row);
+      for (Item item : group.getItemSet()) {
+        String var = item.getPosVar();
         //goto表
         if (Grammar.getNonTerminals().contains(var)) {
-          if (GOTO_TABLE.containsKey(group)) {
-            Group next = GOTO_TABLE.get(group).get(var);
-            if (next != null) {
-              addToDoubleMap(table, group, var, Action.createGoto(next));
-            } else {
-              addToDoubleMap(table, group, var, Action.createError());
+          addToDoubleMap(table, group, var, Action.createGoto(gotoState(group, var)));
+        }
+        //action表
+        else {
+          //s
+          if (!var.equals("END")) {
+            Group nextGroup = gotoState(group, var);
+            addToDoubleMap(table, group, var, Action.createS(nextGroup));
+            if (!allGroups.contains(nextGroup) ){
+              allGroups.add(nextGroup);
             }
-          } else {
-            addToDoubleMap(table, group, var, Action.createError());
+          }
+          //r
+          else {
+            Production production = item.getProduction();
+            for (String vt : Grammar.getFollow().get(production.getLeft())) {
+              //   if(table.get(group).get(vt)==null){
+              addToDoubleMap(table, group, vt, Action.createR(production));
+              // }
+            }
           }
         }
       }
     }
-//    for(Group p:reductionGroup){
-//      System.out.println(p.getId());
-//    }
+
   }
 
-  public static void showTable() {
-//    static Map<Group, Map<String, Action>> table = new HashMap<>();//分析表 K :状态 行 V：{符号 列, action 格子 }
-    //print表头
-    StringBuilder sb = new StringBuilder();
-    sb.append("=========================TABLE=================\n");
-    sb.append("state").append("\t\t");
-    for (String var : Grammar.getTerminals()) {
-      sb.append(var).append("\t\t");
+
+  public static <OuterK, InnerK, InnerV> void addToDoubleMapPrintConflict(
+      Map<OuterK, Map<InnerK, InnerV>> outerMap, OuterK outerK, InnerK innerK, InnerV innerV,
+      String format) {
+    InnerV old = addToDoubleMap(outerMap, outerK, innerK, innerV);
+    if (old != null && !old.equals(innerV)) {
+      System.out.println(String.format(format, old, innerV));
     }
-    for (String var : Grammar.getNonTerminals()) {
-      sb.append(var).append("\t\t");
-    }
-    sb.append("\n");
-    for (Entry<Group, Map<String, Action>> row : table.entrySet()) {
-      sb.append(row.getKey().getId()).append("\t\t\t");
-      for (Entry<String, Action> grid : row.getValue().entrySet()) {
-        sb.append(grid.getValue()).append("\t");
-      }
-      sb.append("\n");
-    }
-    System.out.println(sb.toString());
   }
 
   public static void match(List<String> inputTokens) {
@@ -239,18 +249,16 @@ public class LR0 {
     Stack<String> opStack = new Stack<>();
     //放入结束符号
     opStack.push("#");
+
     //当前步骤
     int step = 1;
     //当前面临符号的位置
     int pos = 0;
 
     while (true) {
-      // 当前状态栈栈顶状态
-      Group currentStatus = stateStack.peek();
-      //当前面临符号
-      //  String currentInput = inputTokens.get(pos);
+
       // 获取当前栈顶状态遇到输入符号得到的 action
-      Action action = table.get(currentStatus).get(inputTokens.get(pos));
+      Action action = table.get(stateStack.peek()).get(inputTokens.get(pos));
       if (action == null) {
         System.out.println("ssss");
       }
@@ -262,8 +270,7 @@ public class LR0 {
           showStep(step++, opStack.peek(), inputTokens.get(pos), "error");
         }
         return;
-      }
-      else if (action.isError()) {
+      } else if (action.isError()) {
         System.out.println("!error!");
         return;
       }
@@ -273,7 +280,9 @@ public class LR0 {
         opStack.push(inputTokens.get(pos));
         pos++;
         showStep(step++, opStack.peek(), inputTokens.get(pos), "move");
-      } else if (action.isR()) {
+      }
+      //规约
+      else if (action.isR()) {
         // 归约操作的产生式
         Production production = action.getProduction();
         int size = production.getRight().size();
@@ -283,7 +292,9 @@ public class LR0 {
         List<String> popVars = new ArrayList<>();
         // 根据产生式右部的字符数量，从状态栈和字符栈中弹出对应数量的元素
         for (int index = 0; index < size; index++) {
-          if(production.getRight().get(index).equals("$"))continue;
+          if (production.getRight().get(index).equals("$")) {
+            continue;
+          }
           popStates.add(stateStack.pop().getId());
           popVars.add(opStack.pop());
         }
@@ -303,16 +314,6 @@ public class LR0 {
   }
 
   public static void showStep(int step, String opVar, String inputVar, String info) {
-//    String actionName;
-//    if (action.isAcc()) {
-//      actionName = "accept";
-//    } else if (action.isS()) {
-//      actionName = "move";
-//    } else if (action.isR()) {
-//      actionName = "reduction";
-//    } else {
-//      actionName = "error";
-//    }
     System.out.println(step + "\t" + opVar + "#" + inputVar + "\t" + info);
   }
 

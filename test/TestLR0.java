@@ -1,5 +1,4 @@
-package syntax;
-
+import static syntax.SyntaxAnalysis.tokens2string;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,19 +9,15 @@ import lexical_analysis.Lexer;
 import lexical_analysis.NFA;
 import lexical_analysis.Token;
 import lexical_analysis.TokenTable;
+import org.junit.Test;
 import syntax.Grammar;
+import syntax.syntaxLL.LL1;
 import syntax.syntaxLR.LR0;
 
-public class SyntaxAnalysis {
-
-  //得到输入串
-//String input="i * i + i";
-  public static void main(String[] args) {
-    //输入文件
+public class TestLR0 {
+  @Test
+  public  void test(){
     String path = "src/test/test1.txt";
-  String grammarPath = "src/test/grammar.txt";
-   // String grammarPath = "src/test/grammar.txt";
-
     //lex
     NFA nfa = new NFA();
     DFA dfa = new DFA();
@@ -35,20 +30,19 @@ public class SyntaxAnalysis {
     } catch (IOException e) {
       e.printStackTrace();
     }
-
     //syntax
+    //String grammarPath = "src/test/grammarTestSLR.txt";
+   // String grammarPath = "src/test/grammarTestLR.txt";
+    String grammarPath = "src/test/grammar.txt";
     Grammar preprocess = new Grammar();
     preprocess.inputGrammar(grammarPath);
-    preprocess.generateFirstCollection();
-
     LR0.createTable();
-
-   // analysis
-List<String> testString= Arrays.asList("i", "*", "i","+","i");
-   // #####!
-  //  List<String> testString= Arrays.asList("a", "c", "d","#");
-LR0.match(testString);
+    // analysis
+//   List<String> testString= Arrays.asList("i", "*", "i","+","i","#");
+   // List<String> testString= Arrays.asList("a","c","c","d","#");
+   // LR0.match(testString);
     LR0.match(tokens2string(TokenTable.getTokens()));
+    System.out.println("testLR");
 
   }
 
@@ -77,6 +71,4 @@ LR0.match(testString);
     return strings;
   }
 
-
 }
-

@@ -28,8 +28,8 @@ public class Item implements Comparable<Item> {
   }
 
   public boolean isReduction() {
-    return (label.indexOf("•") == label.size() - 1)
-        || (label.indexOf("•") == label.size() - 2 && label.get(label.size() - 1).equals("$"));
+    return (label.indexOf("•") == label.size() - 1);
+//        || (label.indexOf("•") == label.size() - 2 && label.get(label.size() - 1).equals("$"));
   }
 
   /**
@@ -52,6 +52,41 @@ public class Item implements Comparable<Item> {
     return create(item.production, item.pos + 1);
   }
 
+public static  Item removeEpsilon(Item item){
+
+    Production production=item.production;
+    //修改production
+    Integer pos=item.pos;
+  List<String> list = new ArrayList<>();
+  list.add(production.getLeft());
+  String posSymbol = null;
+  List<String>newRight = new ArrayList<>();
+  for (int index = 0; index < production.getRight().size(); index++) {
+    if (index != pos) {
+      newRight.add(production.getRight().get(index));
+    }
+  }
+  if(newRight.size()==0){
+    return null;
+  }
+  Production newProduction=new Production(production.getLeft(),newRight);
+
+  for (int index = 0; index < newProduction.getRight().size(); index++) {
+    String symbol = newProduction.getRight().get(index);
+    if (index == pos) {
+      posSymbol = symbol;
+      list.add(ITEM_SYMBOL);
+    }
+      list.add(symbol);
+  }
+
+  if (pos == newProduction.getRight().size()) {
+    posSymbol = END;
+    list.add(ITEM_SYMBOL);
+  }
+  return new Item(newProduction, pos, posSymbol, list);
+
+}
   private static Item create(Production production, int pos) {
     //todo
     //compUint->$
