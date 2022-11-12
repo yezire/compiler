@@ -190,9 +190,6 @@ public class LR0 {
     allGroups=getAllGroups();
     for (Group group : allGroups) {
       //acc group
-      if (group.getId() == 120) {
-        System.out.println("here");
-      }
       if (group.isAccGroup()) {
         addToDoubleMap(table, group, "#", Action.createAcc());
         continue;

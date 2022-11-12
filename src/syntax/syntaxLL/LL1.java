@@ -65,7 +65,8 @@ public class LL1 {
    */
   public boolean hasCommonFactor(List<Production> candidates) {
     //只需判断第一个是否存在相同的
-    for (int i = 0; i < candidates.size(); i++) {
+    for (int i = 0
+        ; i < candidates.size(); i++) {
       for (int j = i + 1; j < candidates.size(); j++) {
         String ci = candidates.get(i).getRight().get(0);
         String cj = candidates.get(j).getRight().get(0);
@@ -202,9 +203,6 @@ public class LL1 {
     varStack.push(Grammar.getStart());
     input.add("#");
     while (true) {
-      if (step == 9) {
-        System.out.println("here");
-      }
       if (Grammar.getTerminals().contains(varStack.peek())) {
         if (varStack.peek().equals(input.get(pos))) {
           //若X = a = ‘#’，则宣布分析成功，停止分析过程。

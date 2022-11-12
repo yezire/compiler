@@ -17,7 +17,7 @@ import syntax.syntaxLR.LR0;
 public class TestLR0 {
   @Test
   public  void test(){
-    String path = "src/test/test1.txt";
+    String path = "src/test/test5.txt";
     //lex
     NFA nfa = new NFA();
     DFA dfa = new DFA();
@@ -38,9 +38,6 @@ public class TestLR0 {
     preprocess.inputGrammar(grammarPath);
     LR0.createTable();
     // analysis
-//   List<String> testString= Arrays.asList("i", "*", "i","+","i","#");
-   // List<String> testString= Arrays.asList("a","c","c","d","#");
-   // LR0.match(testString);
     LR0.match(tokens2string(TokenTable.getTokens()));
     System.out.println("testLR");
 
