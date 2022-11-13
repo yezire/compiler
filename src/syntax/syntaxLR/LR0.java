@@ -196,6 +196,7 @@ public class LR0 {
       }
       Map<String, Action> row = new HashMap<String, Action>();
       table.put(group, row);
+
       for (Item item : group.getItemSet()) {
         String var = item.getPosVar();
         //goto表

@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import syntax.Grammar;
-import syntax.Production;
+
 
 public class Group {
 
@@ -15,12 +15,8 @@ public class Group {
   private final Set<Item> itemSet;//项目集合
   private final String label;
   public static final Map<String, Group> allGroups = new HashMap<>();//记录所有规范项目族
-  public Production reProduction;
   public static  Map<Integer,String> idMap = new HashMap<>();
 
-//  public Set<Item> getReductionItems() {
-//    return reductionItems;
-//  }
 
   private Group(int id, Set<Item> itemSet, String label) {
     this.id = id;
@@ -88,7 +84,6 @@ public  boolean isReductionGroup(){
     for (Item item : itemSet) {
       if (item.isReduction()) {
        reductionItems.add(item);
-       reProduction=item.getProduction();
       }
     }
     return  reductionItems;

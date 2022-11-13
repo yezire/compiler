@@ -160,11 +160,6 @@ public class LL1 {
             row.put(vt, emptyProduction);
           } else {
 //            //todo:error
-//            if(emptyProduction == null){
-//              for (String b : Grammar.getFollow().get(vn)) {
-//                row.put(b, new Production("synch"));
-//              }
-//            }
           }
         }
       }

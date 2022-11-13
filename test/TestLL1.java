@@ -37,7 +37,7 @@ ll.createTable();
       e.printStackTrace();
     }
 ll.analysis(tokens2string(TokenTable.getTokens()));
-    System.out.println("test1");
+    System.out.println("test file: "+path);
 
   }
 

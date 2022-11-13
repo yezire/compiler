@@ -60,17 +60,11 @@ public class Grammar {
         terminals.addAll(right);
       }
       terminals.removeIf(s -> nonTerminals.contains(s));
-      //remove $
-      //？todo:why remove
-      //terminals.remove("$");
-      //add #
       terminals.add("#");
-      //todo
-      //generateFollowCollection();
       generateProductionsByLeft();
       generateProductionsByRight();
       generateFirstCollection();
-      Follow();
+      generateFollowCollection();
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -161,15 +155,12 @@ public class Grammar {
   /**
    * 生成FOLLOW集
    */
-  public static void Follow() {
+  public static void generateFollowCollection() {
     int preFollowSize = 0;
     while (true) {
       int afterFollowSize = 0;
       // 求得所有非终结符的Follow集
       for (String character : nonTerminals) {
-        if (character.equals("unaryExp")) {
-          System.out.println("here");
-        }
         generateFollow(character);
       }
       // 一次计算后follow集中元素数量

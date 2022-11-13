@@ -17,7 +17,7 @@ import syntax.syntaxLR.LR0;
 public class TestLR0 {
   @Test
   public  void test(){
-    String path = "src/test/test5.txt";
+    String path = "src/test/test1.txt";
     //lex
     NFA nfa = new NFA();
     DFA dfa = new DFA();
@@ -39,7 +39,7 @@ public class TestLR0 {
     LR0.createTable();
     // analysis
     LR0.match(tokens2string(TokenTable.getTokens()));
-    System.out.println("testLR");
+    System.out.println("testLR"+path);
 
   }
 

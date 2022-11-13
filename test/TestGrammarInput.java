@@ -7,7 +7,7 @@ public class TestGrammarInput {
   @Test
   public void test() {
     // String path ="/Users/yezizhi/Desktop/compiler/src/syntax/grammarTestLR.txt";
-    String path = "src/test/grammarTestSLR.txt";
+    String path = "src/test/grammar.txt";
     // String path = "src/test/grammarTestLR.txt";
     Grammar preprocess =new Grammar();
     preprocess.inputGrammar(path);
@@ -20,6 +20,9 @@ public class TestGrammarInput {
 
     System.out.println("================FirstSet===============");
     Grammar.getFirst().entrySet().forEach(this::show);
+
+    System.out.println("================FollowSet===============");
+    Grammar.getFollow().entrySet().forEach(this::show);
 
   }
 
