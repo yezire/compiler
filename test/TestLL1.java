@@ -20,10 +20,10 @@ public class TestLL1 {
     preprocess.inputGrammar(grammarPath);
     LL1 ll=new LL1();
     ll.initProductions();
-   ll.extract();
+   //ll.extract();
    ll.isLL1();
 ll.createTable();
-    String path = "src/test/testError.txt";
+    String path = "src/test/testNew.txt";
     //lex
     NFA nfa = new NFA();
     DFA dfa = new DFA();

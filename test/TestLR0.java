@@ -17,7 +17,7 @@ import syntax.syntaxLR.LR0;
 public class TestLR0 {
   @Test
   public  void test(){
-    String path = "src/test/test1.txt";
+    String path = "src/test/testNew.txt";
     //lex
     NFA nfa = new NFA();
     DFA dfa = new DFA();
@@ -48,6 +48,10 @@ public class TestLR0 {
     for (Token token : tokens) {
       if (token.getLexeme().equals("#")) {
         strings.add("#");
+      }
+      if (token.getLexeme().equals("main")) {
+        strings.add("func");
+        continue;
       }
       String tokenType = token.getTokenType();
       switch (tokenType) {

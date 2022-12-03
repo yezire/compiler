@@ -72,22 +72,8 @@ public class Group {
     }
     return false;
   }
-public  boolean isReductionGroup(){
-    if(collectReductionItems().size()!=0){
-      return  true;
-    }else  return false;
-}
 
 
-  public Set<Item> collectReductionItems() {
-    Set<Item>reductionItems = new HashSet<>();
-    for (Item item : itemSet) {
-      if (item.isReduction()) {
-       reductionItems.add(item);
-      }
-    }
-    return  reductionItems;
-  }
 
 
   @Override

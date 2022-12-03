@@ -39,23 +39,23 @@ public class LL1 {
     return production.getLeft().equals(production.getRight().get(0));
   }
 
-  public void removeLeftRecursion() {
-    //消除当前产生式的直接左递归
-  }
+//  public void removeLeftRecursion() {
+//    //消除当前产生式的直接左递归
+//  }
 
-  public void extract() {
-    //提取公共左因子
-    /**
-     * A→δβ1 |δβ2 | ... |δβn |γ1 |γ2 | ... |γm(其中，每个γ不以δ开头
-     * 改写为
-     * A→δA’ |γ1 |γ2 | ... |γm
-     * A’→β1 |β2 | ... |βn
-     */
-    //会产生一些新的产生式
-    for (Entry<String, List<Production>> e : allProductions.entrySet()) {
-      hasCommonFactor(e.getValue());
-    }
-  }
+//  public void extract() {
+//    //提取公共左因子
+//    /**
+//     * A→δβ1 |δβ2 | ... |δβn |γ1 |γ2 | ... |γm(其中，每个γ不以δ开头
+//     * 改写为
+//     * A→δA’ |γ1 |γ2 | ... |γm
+//     * A’→β1 |β2 | ... |βn
+//     */
+//    //会产生一些新的产生式
+//    for (Entry<String, List<Production>> e : allProductions.entrySet()) {
+//      hasCommonFactor(e.getValue());
+//    }
+//  }
 
   /**
    * 判断是否存在公共因子
@@ -63,22 +63,22 @@ public class LL1 {
    * @param candidates 候选产生式
    * @return boolean
    */
-  public boolean hasCommonFactor(List<Production> candidates) {
-    //只需判断第一个是否存在相同的
-    for (int i = 0
-        ; i < candidates.size(); i++) {
-      for (int j = i + 1; j < candidates.size(); j++) {
-        String ci = candidates.get(i).getRight().get(0);
-        String cj = candidates.get(j).getRight().get(0);
-        if (ci.equals(cj) && !ci.equals("$")) {
-          // System.out.println("存在");
-          return true;
-        }
-      }
-    }
-    //System.out.println("不存在");
-    return false;
-  }
+//  public boolean hasCommonFactor(List<Production> candidates) {
+//    //只需判断第一个是否存在相同的
+//    for (int i = 0
+//        ; i < candidates.size(); i++) {
+//      for (int j = i + 1; j < candidates.size(); j++) {
+//        String ci = candidates.get(i).getRight().get(0);
+//        String cj = candidates.get(j).getRight().get(0);
+//        if (ci.equals(cj) && !ci.equals("$")) {
+//          // System.out.println("存在");
+//          return true;
+//        }
+//      }
+//    }
+//    //System.out.println("不存在");
+//    return false;
+//  }
 
   /**
    * 判断是不是LL1文法 无直接左递归 候选首符集两两不相交 若存在某个候选首符集包含ε的非终结符的first集和follow集不相交
@@ -133,11 +133,9 @@ public class LL1 {
      • 若ε属于某个FIRST(αi)，且a∈FOLLOW(A)，则让A与ε自动匹配; • 否则，a的出现是一种语法错误。
      */
     for (String vn : Grammar.getNonTerminals()) {
-
       //row
       //vt p
       Map<String, Production> row = new HashMap<>();
-
       for (String vt : Grammar.getTerminals()) {
         //col
         List<Production> candidates = allProductions.get(vn);

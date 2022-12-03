@@ -55,8 +55,10 @@ LR0.match(testString);
   public static List<String> tokens2string(List<Token> tokens) {
     List<String> strings = new ArrayList<>();
     for (Token token : tokens) {
-      if (token.getLexeme().equals("#")) {
-        strings.add("#");
+
+      if (token.getLexeme().equals("main")) {
+        strings.add("Ident");
+        continue;
       }
       String tokenType = token.getTokenType();
       switch (tokenType) {

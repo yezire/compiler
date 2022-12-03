@@ -190,7 +190,6 @@ public class Grammar {
     List<Production> productions = productionsByRight.get(vn);
     if (productions != null) {
       for (Production p : productions) {
-
         // FIRST(β)若有空  FIRST(β) \ ϵ ，follow A 若有follow A
         // FIRST(β)若无空 FIRST(β)
         int index = p.getRight().indexOf(vn);

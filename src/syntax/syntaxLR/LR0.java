@@ -254,7 +254,9 @@ public class LR0 {
     int pos = 0;
 
     while (true) {
-
+if(step==225){
+  System.out.println("hhh");
+}
       // 获取当前栈顶状态遇到输入符号得到的 action
       Action action = table.get(stateStack.peek()).get(inputTokens.get(pos));
       if (action == null) {
